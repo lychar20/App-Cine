@@ -1,0 +1,34 @@
+{
+  "name": "projet-cine",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-navigation/stack": "^6.3.16",
+    "expo": "~48.0.15",
+    "expo-status-bar": "~1.4.4",
+    "link": "^1.5.1",
+    "moment": "^2.29.4",
+    "react": "18.2.0",
+    "react-datepicker": "^4.15.0",
+    "react-native": "^0.71.8",
+    "react-native-date-picker": "^4.2.13",
+    "react-native-gesture-handler": "^2.9.0",
+    "react-native-image-crop-picker": "^0.39.0",
+    "react-native-material-design": "^0.3.7",
+    "react-native-modern-datepicker": "^1.0.0-beta.91",
+    "react-native-stopwatch-timer": "^0.0.21",
+    "unlink": "^0.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3"
+  },
+  "private": true
+}
