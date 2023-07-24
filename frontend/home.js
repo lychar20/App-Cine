@@ -1,40 +1,75 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, View, Image } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, Image, Alert } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import Twitter from "./icons/Twitter.png";
 
+import Axios from "axios"
+
+import { LogInScreen } from "./signIn";
+
+import {useRouter} from "expo-router";
+import axios from "axios";
+
+
+//import { login } from "../backend/controllers/user";
+
 /* import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
 
 
 
-
-
-
-
 export default function Home({ navigation }) {
+   
+     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState(''); 
 
+
+     console.log('EMAIL', email);
+    console.log('PASSWORD', password);
+
+  const OnSignIn = () => {
+    Axios.post("http://192.168.1.14:3000/api/auth/login/", {
+      email: email,
+      password: password,
+    }).then((response) => {
+      console.log(response)
+      navigation.navigate('Question')
+      
+    }).catch(function(error) {
+      console.log(error.response.data);
+    });
+  
+  }
+     
+    
+    
 
     return (
       <View style={styles.container}>
 
-        <Text style={styles.title} >App Quiz  </Text>
+        <Text style={styles.title} >App Quiz {/* {tweet}  */} </Text>
         <StatusBar style="auto" />
 
         {/* Zone de saisie */}
 
         <View style={styles.inputContainer} >
         <Entypo name="email" size={20} color= '#666' style={{marginRight: 5}} />
-        <TextInput style={styles.input} placeholder={'Entrer votre email'} />
+        <TextInput style={styles.input} 
+        placeholder={'Entrer votre email'}
+        value={email}
+        onChangeText= {setEmail}  
+        />
         </View>
 
         <View style={styles.inputContainer} >
         <MaterialCommunityIcons name="security" size={20} color= '#666' style={{marginRight: 5}} />
-        <TextInput style={styles.input} secureTextEntry />
+        <TextInput style={styles.input} secureTextEntry
+        onChangeText= {setPassword} 
+        />
 
         <TouchableOpacity>  
           <Text style={{color: '#0065f'}} >Oublié?</Text>
@@ -44,7 +79,7 @@ export default function Home({ navigation }) {
 
         {/* Button Action */}
 
-        <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('Question') }  >
+        <TouchableOpacity style={styles.touchableButton} onPress=  {OnSignIn}   /*  {() => navigation.navigate('Question') }   */  >
           <Text style={styles.touchableText} >Me connecter</Text>
         </TouchableOpacity>
 

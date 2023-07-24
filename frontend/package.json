@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-navigation/stack": "^6.3.16",
+    "axios": "^1.4.0",
     "expo": "~48.0.15",
     "expo-status-bar": "~1.4.4",
     "link": "^1.5.1",
@@ -23,7 +24,10 @@
     "react-native-material-design": "^0.3.7",
     "react-native-modern-datepicker": "^1.0.0-beta.91",
     "react-native-stopwatch-timer": "^0.0.21",
-    "unlink": "^0.0.2"
+    "unlink": "^0.0.2",
+    "expo-router": "^1.0.0",
+    "typescript": "^4.9.4",
+    "@types/react": "~18.0.27"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

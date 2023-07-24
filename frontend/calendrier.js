@@ -6,7 +6,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 import DatePicker from 'react-native-modern-datepicker';
 
-
+import Axios from "axios"
 
 export default function Calendrier () {
    const [open, setOpen] = useState(false); // Open and close the modal
@@ -32,6 +32,87 @@ export default function Calendrier () {
 
  console.log(date); 
  console.log (birthDate);
+
+
+ // Test API
+
+    const [tweet, setTweet] = useState("");
+ const getTweet = async() => {
+  const response= await Axios.get("http://192.168.1.14:3000/api/getTweet"); //Ca marche
+  setTweet(response.data);
+ }
+
+ useEffect(() => {
+  getTweet()
+ }, []);  
+ 
+ // Autre
+
+
+
+/*   const [tweet, setTweet] = useState([]);
+  const getTweet = () => {
+    fetch("http://192.168.1.14:3000/api/getTweet")
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (myJson) {
+        setTweet(myJson);
+      });
+  };
+  useEffect(() => {
+    getTweet();
+  }, []);  */
+
+  // Autre
+
+  /* const [tweet, setTweet] = useState("");
+
+useEffect(() => {
+  const getTweet = async () => {
+
+    const url = "http://192.168.1.14:3000/api/getTweet";
+    const res = await fetch(url);
+    console.log(res);
+  };
+  getTweet();
+}, []);  */
+
+/* const [tweet, setTweet] = useState("");
+      const getTweet = async () => {
+        const url = 'http://192.168.1.14:3000/api/getTweet'
+        const response = await fetch(url)
+        setTweet(response.data);
+        console.log( "ICI",  data)
+        console.log("POURQUOI", response);
+      }
+
+      useEffect(() => {
+      getTweet()
+    }, []);  */
+
+
+    // autre 
+
+/*     let getTweet = () => {
+      fetch('http://192.168.1.14:3000/api/getTweet')
+      .then(res => {
+        console.log("CA MARCHE", res.status);
+        console.log('hello');
+        //return res.json();
+      })
+      .then(
+        (result) => {
+          console.log("PAS DE RESULTAT", result);
+        },
+        (error) => {
+          console.log(error);
+        }
+      )
+    };
+  */
+
+ // Test API
  
   return (
     <SafeAreaView style={styles.container}>
@@ -47,6 +128,8 @@ export default function Calendrier () {
    <Text>
    {date === undefined ? 'Pas de date' : date}
    </Text>
+
+   <Text> ESSAY  {tweet}  </Text>
 
     <Modal 
       animationType= 'slide'
