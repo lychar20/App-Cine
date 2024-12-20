@@ -23,35 +23,53 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
 
 
 export default function Home({ navigation }) {
+
+    // regex to validate email
+    const [checkValidEmail, setCheckValidEmail] = useState(false);
+
+    const handleCheckEmail = (text) => {
+          let re =/\S+@\S+\.\S+/;
+          let regex = /^[\+]?[(]?[0-9]{3} [)]? [-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6} $/im;
+
+      setEmail(text);
+      if(re.test(text) || regex.test(text)) {
+        setCheckValidEmail(false);
+      } else {
+        setCheckValidEmail(true);
+      }
+
+    }
+
+    // End regex to validate email
    
-     const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
 
-
-     console.log('EMAIL', email);
+    console.log('EMAIL', email);
     console.log('PASSWORD', password);
 
   const OnSignIn = () => {
-    Axios.post("http://192.168.1.14:3000/api/auth/login/", {
+     Axios.post("http://192.168.1.20:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
       email: email,
       password: password,
     }).then((response) => {
       console.log(response)
       navigation.navigate('Question')
-      
+
     }).catch(function(error) {
-      console.log(error.response.data);
+      console.log("ERROR", error.response.data);
     });
+
   
+
   }
      
-    
-    
+
 
     return (
       <View style={styles.container}>
 
-        <Text style={styles.title} >App Quiz {/* {tweet}  */} </Text>
+        <Text style={styles.title} >App Quiz  {/* {tweet}  */} </Text>
         <StatusBar style="auto" />
 
         {/* Zone de saisie */}
@@ -61,9 +79,22 @@ export default function Home({ navigation }) {
         <TextInput style={styles.input} 
         placeholder={'Entrer votre email'}
         value={email}
-        onChangeText= {setEmail}  
+        onChangeText= /* {setEmail}   */ {(text)=>handleCheckEmail(text)}
         />
+
+       
         </View>
+
+        {/* Wrong format message   */}   
+        {checkValidEmail ? (
+          <Text style={styles.textFailed}>Wrong format email</Text>
+        ) : ( 
+          <Text style={styles.textFailed}></Text>
+        ) }
+
+        
+
+        {/* End Wrong format message   */} 
 
         <View style={styles.inputContainer} >
         <MaterialCommunityIcons name="security" size={20} color= '#666' style={{marginRight: 5}} />
@@ -192,5 +223,9 @@ export default function Home({ navigation }) {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    textFailed: {
+      color: 'red',
+      marginLeft: 200,
     }
   });

@@ -38,7 +38,8 @@ export default function Calendrier () {
 
     const [tweet, setTweet] = useState("");
  const getTweet = async() => {
-  const response= await Axios.get("http://192.168.1.14:3000/api/getTweet"); //Ca marche
+   const response=  await Axios.get("http://192.168.1.20:3000/api/getTweet")  ; //Ca marche pour clermont
+      /* const response=     await Axios.get("http://192.168.1.112:3000/api/getTweet") */
   setTweet(response.data);
  }
 

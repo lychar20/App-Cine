@@ -12,12 +12,10 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 import DatePicker from 'react-native-modern-datepicker';
 
-
-
-
-
 /* import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
+
+import Axios from "axios"
 
 
 
@@ -26,6 +24,31 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
 
 
 export default function SignUpScreen ({navigation}) {
+
+  // Function register
+
+  const [email, setEmail] = useState('');
+    const [password, setPassword] = useState(''); 
+
+
+     console.log('EMAIL', email);
+    console.log('PASSWORD', password);
+
+  const Register = () => {
+     Axios.post("http://192.168.1.20:3000/api/auth/signup/" /*  Axios.post("http://192.168.1.112:3000/api/auth/signup/" */, {
+      email: email,
+      password: password,
+    }).then((response) => {
+      console.log(response)
+      navigation.navigate('Question')
+      
+    }).catch(function(error) {
+      console.log(error.response.message);
+    });
+  
+  }
+
+  //
 
 
   const [open, setOpen] = useState(false); // Open and close the modal
@@ -113,12 +136,17 @@ export default function SignUpScreen ({navigation}) {
 
         <View style={styles.inputContainer} >
         <Entypo name="email" size={20} color= '#666' style={{marginRight: 5}} />
-        <TextInput style={styles.input} placeholder={'Entrez votre email'} />
+        <TextInput style={styles.input} placeholder={'Entrez votre email'}
+        value={email}
+        onChangeText= {setEmail} 
+        />
         </View>
 
         <View style={styles.inputContainer} >
         <Ionicons name="ios-lock-closed-outline" size={20} color= '#666' style={{marginRight: 5}} />
-        <TextInput style={styles.input} secureTextEntry placeholder="Entrez un mot de passe" />
+        <TextInput style={styles.input} secureTextEntry placeholder="Entrez un mot de passe"
+        onChangeText= {setPassword} 
+        />
         </View>
 
         <View style={styles.inputContainer} >
@@ -128,7 +156,7 @@ export default function SignUpScreen ({navigation}) {
 
         {/* Button Action */}
 
-        <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('Question') }  >
+        <TouchableOpacity style={styles.touchableButton} onPress= {Register} /* {() => navigation.navigate('Question') }  */ >
           <Text style={styles.touchableText} >M'incrire</Text>
         </TouchableOpacity>
 
