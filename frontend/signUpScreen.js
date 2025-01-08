@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from 'expo-status-bar';
-import { Button, Modal, StyleSheet, Text, TextInput, View, Image, SafeAreaView } from 'react-native';
+import { Button, Modal, StyleSheet, Text, TextInput, View, Image, SafeAreaView, ScrollView } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -35,7 +35,7 @@ export default function SignUpScreen ({navigation}) {
     console.log('PASSWORD', password);
 
   const Register = () => {
-     Axios.post("http://192.168.1.20:3000/api/auth/signup/" /*  Axios.post("http://192.168.1.112:3000/api/auth/signup/" */, {
+     Axios.post("http://192.168.1.17:3000/api/auth/signup/" /*  Axios.post("http://192.168.1.112:3000/api/auth/signup/" */, {
       email: email,
       password: password,
     }).then((response) => {
@@ -66,6 +66,7 @@ export default function SignUpScreen ({navigation}) {
 
     return (
       <SafeAreaView style={styles.container}>
+        <ScrollView>
 
         <Text style={styles.title} >S'inscrire  </Text>
         <StatusBar style="auto" />
@@ -190,6 +191,7 @@ export default function SignUpScreen ({navigation}) {
           
         </View> */}
 
+        </ScrollView>
       </SafeAreaView>
     );
   }

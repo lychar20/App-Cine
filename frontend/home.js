@@ -49,7 +49,7 @@ export default function Home({ navigation }) {
     console.log('PASSWORD', password);
 
   const OnSignIn = () => {
-     Axios.post("http://192.168.1.20:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
+     Axios.post("http://192.168.1.17:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
       email: email,
       password: password,
     }).then((response) => {
