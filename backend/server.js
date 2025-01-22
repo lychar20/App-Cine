@@ -35,13 +35,50 @@ const errorHandler = error => {
   }
 };
 
-const server = http.createServer(app);
+const websocketServer = require("websocket").server;
+const httpServer = http.createServer(app);
 
-server.on('error', errorHandler);
-server.on('listening', () => {
-  const address = server.address();
+httpServer.on('error', errorHandler);
+httpServer.on('listening', () => {
+  const address = httpServer.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
   console.log('Listening on ' + bind);
 });
 
-server.listen(port);
+httpServer.listen(port);
+
+//hasmap
+const clients = {};
+
+
+const wsServer = new websocketServer({
+  "httpServer": httpServer
+})
+wsServer.on("request", request => {
+
+  //connect
+  const connection = request.accept(null, request.origin);
+  connection.on("open", () => console.log("opened!"))
+  connection.on("close", () => console.log("closed!"))
+  connection.on("message", () => message => {
+    const result  = JSON.parse(message.utf8Data)
+    // I have received a message from the client
+    console.log("RESULT", result)
+
+  })
+
+  //generate a new clientId
+  const clientId = guid();
+  clients[clientId] = {
+    "connection": connection
+  }
+
+  const payLoad = {
+    "method": "connect",
+    "clientId": clientId
+  }
+
+  //send back the client connect
+  connection.send(JSON.stringify(payLoad))
+
+})

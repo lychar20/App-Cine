@@ -13,6 +13,7 @@ import Question from "./questions";
 import SignUpScreen from "./signUpScreen";
 import StopTime from './stopTime';
 import Calendrier from './calendrier';
+import Welcome from './welcome';
 
 
 const Stack = createStackNavigator();
@@ -20,10 +21,11 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="home" >
-        <Stack.Screen name="Home" component={Home} options={{headerShown : false}} /> 
+      <Stack.Navigator  >
+        <Stack.Screen name="Home" component={Home} options={{headerShown : false}} />
+        <Stack.Screen name="Welcome" component={Welcome} options={{headerShown : false}} />  
         <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
-        <Stack.Screen name="Question" component={Question} /> 
+        <Stack.Screen name="Question" component={Question} options={{headerShown : false}} /> 
         <Stack.Screen name="Calendrier" component={Calendrier} />       
       </Stack.Navigator>
     </NavigationContainer> 

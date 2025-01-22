@@ -152,6 +152,14 @@ export default function Question () {
         if(counter >= 1) {
             setCounter((counter) => counter - 1);
         }
+        if(counter === 0 && currentOptionSelected !=null) {
+            setCurrentQuestionIndex(currentQuestionIndex+1);
+            setCurrentOptionSelected(null);   
+            setCorrectOption(null);
+            setIsOptionsDisabled(false);
+            setShowNextButton(false);
+            setCounter(15); 
+        }
         if(counter === 0) {
             setCurrentQuestionIndex(currentQuestionIndex+1);
             setCounter(15); 

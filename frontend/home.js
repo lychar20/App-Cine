@@ -8,6 +8,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import Twitter from "./icons/Twitter.png";
 
 import Axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { LogInScreen } from "./signIn";
 
@@ -45,16 +46,24 @@ export default function Home({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
 
+
+
+  
+
     console.log('EMAIL', email);
     console.log('PASSWORD', password);
+
+  
 
   const OnSignIn = () => {
      Axios.post("http://192.168.1.17:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
       email: email,
       password: password,
     }).then((response) => {
-      console.log(response)
-      navigation.navigate('Question')
+      console.log("ICI", response.data.data)
+      AsyncStorage.setItem('token', JSON.stringify(response.data.data));
+      navigation.navigate('Welcome')
+      
 
     }).catch(function(error) {
       console.log("ERROR", error.response.data);
@@ -64,7 +73,6 @@ export default function Home({ navigation }) {
 
   }
      
-
 
     return (
       <View style={styles.container}>
@@ -113,6 +121,7 @@ export default function Home({ navigation }) {
         <TouchableOpacity style={styles.touchableButton} onPress=  {OnSignIn}   /*  {() => navigation.navigate('Question') }   */  >
           <Text style={styles.touchableText} >Me connecter</Text>
         </TouchableOpacity>
+
 
         {/* <Button title='Appuyer ici pour commencer'   onPress=  {() => navigation.navigate('Question') } style={styles.buttondesign} /> */}
 
