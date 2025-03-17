@@ -2,7 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const userRoutes = require('./routes/user');
+const scoreRoutes = require('./routes/score')
 const path = require('path'); 
+const score = require('./models/score');
 
 const app = express();
 
@@ -28,6 +30,7 @@ app.use((req, res, next) => {
   });
 
 
+  app.use('/api/auth', scoreRoutes);
   app.use('/api/auth', userRoutes); 
 
   app.get('/api/getTweet', (req, res, next) => {

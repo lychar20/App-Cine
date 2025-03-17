@@ -10,8 +10,10 @@ exports.signup = (req, res, next) => {
       .then(hash => {
         const user = new User({
           email: req.body.email,
+          name: req.body.name,
           password: hash
         });
+        console.log("NAME", req.body.name);
         user.save()
           .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
           .catch(error => res.status(400).json({ error }));
@@ -23,7 +25,7 @@ exports.signup = (req, res, next) => {
   //////
 
 
- /*  exports.login = (req, res, next) => {
+   exports.login = (req, res, next) => {
     //const user = req.body.email ;
     //const password = req.body.password;
     User.findOne({ email: req.body.email })
@@ -36,13 +38,11 @@ exports.signup = (req, res, next) => {
                     if (!valid) {
                         return res.status(401).json({ message: 'Paire login/mot de passe incorrecte Cinema' });
                     }
+                    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
                     res.status(200).json({
-                        userId: user._id,
-                        token: jwt.sign(
-                            { userId: user._id },
-                            JWT_secret,
-                            { expiresIn: '24h' }
-                        )
+                      status: "ok",
+                      data: token,
+                      userType: user.userType
                     });
 
 
@@ -50,7 +50,7 @@ exports.signup = (req, res, next) => {
                 .catch(error => res.status(500).json({ error }));
         })
         .catch(error => res.status(500).json({ error }));
- }; */
+ }; 
 
 
 
@@ -61,7 +61,7 @@ exports.signup = (req, res, next) => {
 
 ///// test ici /////
 
-exports.login = async (req, res, next) => {
+/* exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     console.log(req.body);
     const oldUser = await User.findOne({ email: email });
@@ -71,7 +71,7 @@ exports.login = async (req, res, next) => {
     }
   
     if (await bcrypt.compare(password, oldUser.password)) {
-      const token = jwt.sign({ email: oldUser.email }, JWT_SECRET);
+      const token = jwt.sign({ userId: oldUser._id, email: oldUser.email }, JWT_SECRET);
       console.log(token);
       if (res.status(201)) {
         return res.send({
@@ -83,58 +83,13 @@ exports.login = async (req, res, next) => {
         return res.send({ error: "error" });
       }
     }
-  };
+  }; */
 
 
 ///// jusqu'a la   ///////
 
 
 
- /*exports.getData = async (req, res, next) => {
-    const { token } = req.body;
-    
-    try{
-        const user = jwt.verify(token, JWT_secret);
-        const useremail = user.email;
-
-        User.findOne({email: useremail}).then((data) => {
-            return res.send({ status: "ok", data: data});
-        });
-    } catch (error) {
-        return res.send({ message: "errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr damn"});
-    }
-
- }; */
-
-
- 
-
- /* exports.getData = async (req, res, next) => {
-    const { token } = req.body;
-    console.log('Token reçu :', token); // Log du token reçu
-
-    if (!token) {
-        console.error("Token manquant dans la requête");
-        return res.status(400).send({ message: "Token manquant" });
-    }
-
-    try {
-        const user = jwt.verify(token.token || token, JWT_secret); // Vérifiez le token
-        const useremail = user.userId; // Utilisez le champ userId pour trouver l'utilisateur
-        console.log('User ID :', useremail); // Log de l'ID utilisateur
-
-        const data = await User.findOne({ email: useremail });
-        if (data) {
-            return res.send({ status: "ok", data: data });
-        } else {
-            console.error("Utilisateur non trouvé pour l'ID :", useremail);
-            return res.status(404).send({ message: "Utilisateur non trouvé" });
-        }
-    } catch (error) {
-        console.error("Erreur de vérification du token ou de récupération des données :", error); // Log de l'erreur
-        return res.status(500).send({ message: "Erreur de récupération des données" });
-    }
-}; */
 
 
 
@@ -145,11 +100,16 @@ exports.getData = async (req, res, next) => {
    
     try {
       const user = jwt.verify(token, JWT_SECRET);
+      const userId = user.userId; // Récupérer l'ID utilisateur
       const useremail = user.email;
-      console.log("INFORMATION", useremail);
+      console.log("INFORMATION", useremail, userId);
   
-      User.findOne({ email: useremail }).then((data) => {
-        return res.send({ status: "Ok", data: data });
+  /*     User.findOne({ email: useremail }).then((data) => {
+        return res.send({ status: "Ok", data: data }); */
+
+         // Rechercher l'utilisateur par ID
+         User.findById(userId).then((data) => {
+          return res.send({ status: "Ok", data: data });
       });
     } catch (error) {
         console.error("Erreur de vérification du token ou de récupération des données :", error); // Log de l'erreur
@@ -157,4 +117,20 @@ exports.getData = async (req, res, next) => {
     }
 };
 
+
+exports.getUserById = async (req, res, next) => {
+  
+  try {
+    const user = await User.findById(req.params.id).select('name'); // Sélectionner uniquement le champ "name"
+    if (user) {
+        res.status(200).json(user);
+    } else {
+        res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+} catch (error) {
+    res.status(500).json({ error: error.message });
+}
+
+
+};
 

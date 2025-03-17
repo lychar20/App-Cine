@@ -1,18 +1,37 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { TouchableOpacity } from "react-native-gesture-handler";
+import Entypo from 'react-native-vector-icons/Entypo'
 import { Axios } from 'axios';
 import axios from 'axios'
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5'
 
 
 
 
-export default function Welcome() {
+export default function Welcome({ navigation }) {
     const [userData, setUserData] = useState('');
+    const [score, setCore] = useState(0);
+    const [latestScore, setLatestScore] = useState(0);
+
+    
 
 
     async function getInfo() {
         const token = await AsyncStorage.getItem('token');
+        //const score = await AsyncStorage.getItem('Score');
+
+        
+        if (score) {
+            const scoreParsed = JSON.parse(score);
+            const firstValue = scoreParsed.score; // Accéder directement à la valeur de score
+            console.log("TEST", firstValue); 
+            setCore(firstValue); // Mettre à jour l'état avec la valeur de score
+        }
+    
+       // console.log('Score est passé', score);
+        
         console.log('TOKEN est passé', token);
         console.log("Contenu" , {token: token});
 
@@ -25,44 +44,71 @@ export default function Welcome() {
       .then(res => {
         console.log("ULTIME", res.data);
         setUserData(res.data.data);
+        
+        
       });
 
-/*         const response = await fetch("http://192.168.1.17:3000/api/auth/userdata/", {
-            method: "POST", // ou 'PUT'
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: {token},
-          }); */
-      
-        /*   console.log("VEREF", token)
-          console.log("EDWIN",response.json())
-          console.log("Réponse du serveur", response.data) */
-
-             
-            
-            // .then(response => response.json())
-         /* console.log("On est ici dans le fetch");
-          setUserData(response);
-          console.log("Réponse du serveur", response.data); */
-      
       
         }
 
+        
 
+        async function getLatestScore() {
+          const token = await AsyncStorage.getItem('token');
+          console.log("TOKEN2", token);
+      
+          if (!token) {
+              console.error("Token manquant !");
+              return;
+          }
+      
+          try {
+              // Modifiez ici pour envoyer le token en tant que paramètre de requête
+        const response = await axios.get(`http://192.168.1.17:3000/api/auth/get-latest-score`, {
+          headers: {
+              Authorization: `Bearer ${token}` // Ajoutez le token dans les en-têtes
+          }
+      });
+      
+              console.log("Dernier score :", response.data.score);
+              setLatestScore(response.data.score);
+              
+              return response.data.score; // Retournez le dernier score
+          } catch (error) {
+              console.error("Erreur lors de la récupération du dernier score :", error.response ? error.response.data : error.message);
+          }
+      }
+
+      
 
     useEffect(() => {
         getInfo();
+        getLatestScore();
     }, []); 
 
-   
 
-   
+
 
   return (
-    <View style={styles.textCenter} >
-      <Text>welcome sur cette nouvelle page </Text>
-      <Text> {userData.email} </Text>
+    <View style={styles.container} >
+
+    <FontAwesomeIcon name='user-circle' size={40} style={styles.logoUser} onPress=  {() => navigation.navigate('Home') }  />
+      <Text style={styles.messagePage} >Bienvenu: {userData.name} </Text>
+      {/* <Text style={styles.messagePage}> {userData.email} </Text> */}
+      {/* <Text style={styles.messagePage}> {userData.name} </Text> */}
+
+      <Text style={styles.messagePage}> Voila ton dernier score:  {latestScore}  </Text>
+       
+      
+      
+
+    <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('Question') }    >
+            <Text style={styles.touchableText} >Commencer une partie</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity>
+      <Text style={styles.scoreSheet} onPress=  {() => navigation.navigate('ScoreSheet') }  > voir le tableau de tous les scores </Text>
+    </TouchableOpacity>
       
     </View>
   )
@@ -72,86 +118,43 @@ export default function Welcome() {
 
 
 const styles = StyleSheet.create({
-    textCenter: {
-        marginTop: 300,
+    container: {
+        
+        
+      },
+      logoUser:{
+        marginTop: 40,
+        marginLeft: 300
+
+      },
+      touchableButton: {
+        marginTop: 50,
+        justifyContent: 'center',
+        alignSelf: 'center',
+        textAlign: 'center',
+        marginBottom: 30,
+        borderRadius: 5,
+        padding: 20,
+        backgroundColor: 'orange'
+      },
+      messagePage: {
         justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
-        fontWeight: '700',
-        fontSize: 16,
+        marginTop: 50,
+        fontSize:26,
+        fontWeight: 'bold'
+      },
+      scoreSheet: {
+        marginTop: 40,
+        color: '#0065ff', 
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+
       }
+
 }) 
 
-    
-
-/*
-
-export default function Welcome() {
-    const [userData, setUserData] = useState('');
-
-    async function getInfo() {
-        const token = await AsyncStorage.getItem('token');
-        console.log('TOKEN est passé', token);
-    
-        if (!token) {
-            console.error("Token est manquant !");
-            return; 
-        }
-    
-        try {
-            const response = await fetch("http://192.168.1.17:3000/api/auth/userdata/", { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ token }) // Assurez-vous d'envoyer juste le token
-            });
-    
-            console.log("On est ici dans le fetch");
-            console.log("Statut de la réponse :", response.status);
-    
-            const data = await response.json(); // Analyser la réponse JSON
-    
-            if (!response.ok) {
-                console.error("Détails de l'erreur :", data);
-                throw new Error('Erreur dans la réponse du serveur');
-            }
-    
-            setUserData(data.data); // Stockez les données utilisateur dans le state
-            console.log("Réponse du serveur", data);
-        } catch (error) {
-            console.error("Erreur lors de la récupération des données", error.message);
-        }
-    }
-
-    
-
-    useEffect(() => {
-        getInfo();
-    }, []); 
-
-    return (
-        <View style={styles.textCenter}>
-            <Text>welcome sur cette nouvelle page</Text>
-            <Text>{JSON.stringify(userData)}</Text> 
-        </View>
-    );
-}
-
-*/
 
 
-/*
-
-const styles = StyleSheet.create({
-    textCenter: {
-        marginTop: 300,
-        justifyContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center',
-        fontWeight: '700',
-        fontSize: 16,
-    }
-});
-
-*/
