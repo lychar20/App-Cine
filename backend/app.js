@@ -6,6 +6,12 @@ const scoreRoutes = require('./routes/score')
 const path = require('path'); 
 const score = require('./models/score');
 
+
+
+//import { initializeSocket } from "./socket/socket";
+
+
+
 const app = express();
 
 app.use(express.json());

@@ -1,6 +1,7 @@
 const http = require('http');
 const app = require('./app');
 
+
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -35,6 +36,7 @@ const errorHandler = error => {
   }
 };
 
+const Server = require('socket.io');
 const websocketServer = require("websocket").server;
 const httpServer = http.createServer(app);
 
