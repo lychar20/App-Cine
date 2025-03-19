@@ -1,12 +1,15 @@
-const jwt = require('jsonwebtoken');
+/* const jwt = require('jsonwebtoken');
 
-const Score = require('../models/score');
+const Score = require('../models/score'); */
+
+import jwt from 'jsonwebtoken';
+import Score from '../models/score.js'
 
 const JWT_SECRET = 'RANDOM_TOKEN_SECRET'
 
 
 
-exports.saveScore = async (req, res, next) => {
+export const saveScore = async (req, res, next) => {
     let { token, score } = req.body;
     token = token.replace(/"/g, "");
     console.log("TOKEN TROIS", token);
@@ -37,7 +40,7 @@ exports.saveScore = async (req, res, next) => {
 };
 
 
-exports.getLatestScore = async (req, res, next) => {
+export const getLatestScore = async (req, res, next) => {
     let token = req.headers.authorization?.split(' ')[1]; // Récupérer le token à partir des en-têtes
     token = token.replace(/"/g, "")
     console.log("DEUXIEME TOKEN", token);
@@ -70,7 +73,7 @@ exports.getLatestScore = async (req, res, next) => {
 };
 
 
-exports.getAllScore = (req, res, next) => {
+export const getAllScore = (req, res, next) => {
     Score.find()
     .sort({ score: -1, createdAt: -1  }) // Trier par score de manière décroissante
     .limit(10) // Limiter à 10 résultats
@@ -85,3 +88,4 @@ exports.getAllScore = (req, res, next) => {
       }
     );
   };  
+

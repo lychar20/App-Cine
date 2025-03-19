@@ -1,11 +1,15 @@
-const bcrypt =require('bcrypt');
+/* const bcrypt =require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const User = require('../models/user');
+const User = require('../models/user'); */
+
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/user.js';
 
 const JWT_SECRET = 'RANDOM_TOKEN_SECRET'
 
-exports.signup = (req, res, next) => {
+export const signup  = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
@@ -25,7 +29,7 @@ exports.signup = (req, res, next) => {
   //////
 
 
-   exports.login = (req, res, next) => {
+  export const login = (req, res, next) => {
     //const user = req.body.email ;
     //const password = req.body.password;
     User.findOne({ email: req.body.email })
@@ -93,7 +97,7 @@ exports.signup = (req, res, next) => {
 
 
 
-exports.getData = async (req, res, next) => {
+export const getData = async (req, res, next) => {
     let { token } = req.body;
     console.log('Token reçu :', token); // Log du token reçu
     token = token.replace(/"/g, "")
@@ -118,7 +122,7 @@ exports.getData = async (req, res, next) => {
 };
 
 
-exports.getUserById = async (req, res, next) => {
+export const getUserById = async (req, res, next) => {
   
   try {
     const user = await User.findById(req.params.id).select('name'); // Sélectionner uniquement le champ "name"

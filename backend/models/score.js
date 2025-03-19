@@ -1,4 +1,6 @@
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
+
+import mongoose from 'mongoose';
 
 const scoreSchema = mongoose.Schema({
   //userId: { type: String, required: true },
@@ -7,4 +9,6 @@ const scoreSchema = mongoose.Schema({
 }, { timestamps: true });
 
 
-module.exports = mongoose.model('Score', scoreSchema);
+//module.exports = mongoose.model('Score', scoreSchema);
+
+export default mongoose.model('Score', scoreSchema);

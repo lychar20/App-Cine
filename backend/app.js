@@ -1,16 +1,23 @@
-const express = require('express');
+/* const express = require('express');
 const mongoose = require('mongoose');
 
 const userRoutes = require('./routes/user');
 const scoreRoutes = require('./routes/score')
 const path = require('path'); 
-const score = require('./models/score');
+const score = require('./models/score'); */
+
+import express from 'express';
+import mongoose from 'mongoose';
+import userRoutes from './routes/user.js'; 
+import scoreRoutes from './routes/score.js'; 
+import path from 'path';
+import dotenv from 'dotenv';
 
 const app = express();
 
 app.use(express.json());
 
-require('dotenv').config();
+dotenv.config();
 
 mongoose.connect(process.env.SECRET_DB,
     { useNewUrlParser: true,
@@ -40,4 +47,6 @@ app.use((req, res, next) => {
   });
  
 
-module.exports = app;
+//module.exports = app;
+
+export default app;

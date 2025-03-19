@@ -1,11 +1,15 @@
-const express = require('express');
+//const express = require('express');
+import express from 'express';
 const router = express.Router();
-const userCtrl = require('../controllers/user'); 
+//const userCtrl = require('../controllers/user'); 
+import { signup, login, getData, getUserById } from '../controllers/user.js';
 
-router.post('/signup', userCtrl.signup); 
-router.post('/login', userCtrl.login);  
-router.post('/userdata', userCtrl.getData );
-router.get('/get-user/:id', userCtrl.getUserById )
+router.post('/signup', signup); 
+router.post('/login', login);  
+router.post('/userdata', getData );
+router.get('/get-user/:id', getUserById )
 
 
-module.exports = router; 
+//module.exports = router; 
+
+export default router;
