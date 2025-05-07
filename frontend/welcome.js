@@ -17,7 +17,6 @@ export default function Welcome({ navigation }) {
 
     
 
-
     async function getInfo() {
         const token = await AsyncStorage.getItem('token');
         //const score = await AsyncStorage.getItem('Score');
@@ -87,15 +86,19 @@ export default function Welcome({ navigation }) {
     }, []); 
 
 
+      // Méthode pour se déconnecter
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token'); // Supprimez le token d'AsyncStorage
+    navigation.navigate('Home'); // Redirigez vers la page d'accueil
+  };
+
 
 
   return (
     <View style={styles.container} >
 
-    <FontAwesomeIcon name='user-circle' size={40} style={styles.logoUser} onPress=  {() => navigation.navigate('Home') }  />
+    <FontAwesomeIcon name='user-circle' size={40} style={styles.logoUser} onPress={handleLogout}  />
       <Text style={styles.messagePage} >Bienvenu: {userData.name} </Text>
-      {/* <Text style={styles.messagePage}> {userData.email} </Text> */}
-      {/* <Text style={styles.messagePage}> {userData.name} </Text> */}
 
       <Text style={styles.messagePage}> Voila ton dernier score:  {latestScore}  </Text>
        
@@ -104,6 +107,10 @@ export default function Welcome({ navigation }) {
 
     <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('Question') }    >
             <Text style={styles.touchableText} >Commencer une partie</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('MultiplayerLobbyScreen') }    >
+            <Text style={styles.touchableText} >Multi joueur Trivia</Text>
     </TouchableOpacity>
 
     <TouchableOpacity>

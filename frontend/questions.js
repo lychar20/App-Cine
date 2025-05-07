@@ -3,7 +3,6 @@ import {StyleSheet, Text, TextInput, View, SafeAreaView, StatusBar, Modal, Butto
 import { TouchableOpacity } from "react-native-gesture-handler";
 import data from "./data";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import StopTime from "./stopTime";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 

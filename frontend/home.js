@@ -5,12 +5,13 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+
+
 import Twitter from "./icons/Twitter.png";
 
 import Axios, { all } from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { LogInScreen } from "./signIn";
 
 import {useRouter} from "expo-router";
 import axios from "axios";
@@ -22,6 +23,7 @@ import axios from "axios";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
 
 
+import { socket } from './socket/index.js';
 
 export default function Home({ navigation }) {
 
@@ -53,6 +55,18 @@ export default function Home({ navigation }) {
     console.log('EMAIL', email);
     console.log('PASSWORD', password);
 
+
+    useEffect(() => {
+      // Écoutez les réponses du serveur
+      socket.on("receive_answer", (data) => {
+        console.log("Réponse reçue:", data);
+      });
+  
+      // Nettoyez l'écouteur lors du démontage du composant
+      return () => {
+        socket.off("receive_answer");
+      };
+    }, []);
  
 
   
