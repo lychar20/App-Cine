@@ -10,8 +10,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import userRoutes from './routes/user.js'; 
 import scoreRoutes from './routes/score.js'; 
+import roomRoutes from "./routes/roomRoutes.js";
 import path from 'path';
 import dotenv from 'dotenv';
+
+//import { initializeSocket } from "./socket/socket.js";
 
 const app = express();
 
@@ -39,6 +42,7 @@ app.use((req, res, next) => {
 
   app.use('/api/auth', scoreRoutes);
   app.use('/api/auth', userRoutes); 
+  app.use('/api/auth', roomRoutes); 
 
   app.get('/api/getTweet', (req, res, next) => {
     res.send("You mother fucker")
@@ -48,5 +52,7 @@ app.use((req, res, next) => {
  
 
 //module.exports = app;
+
+//initializeSocket(server);
 
 export default app;

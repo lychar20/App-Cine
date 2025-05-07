@@ -30,17 +30,15 @@ export const signup  = (req, res, next) => {
 
 
   export const login = (req, res, next) => {
-    //const user = req.body.email ;
-    //const password = req.body.password;
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
-                return res.status(401).json({ message: 'Paire login/mot de passe incorrecte Cine'});
+                return res.status(401).json({ message: 'Paire login/mot de passe incorrecte '});
             }
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
                     if (!valid) {
-                        return res.status(401).json({ message: 'Paire login/mot de passe incorrecte Cinema' });
+                        return res.status(401).json({ message: 'Paire login/mot de passe incorrecte ' });
                     }
                     const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
                     res.status(200).json({
