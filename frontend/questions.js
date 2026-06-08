@@ -4,11 +4,13 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import data from "./data";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import StopTime from "./stopTime";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 //import { Stopwatch, Timer } from 'react-native-stopwatch-timer';
 
 
-export default function Question () {
+export default function Question ({ navigation }) {
 
    
     const allQuestions = data;
@@ -152,6 +154,14 @@ export default function Question () {
         if(counter >= 1) {
             setCounter((counter) => counter - 1);
         }
+        if(counter === 0 && currentOptionSelected !=null) {
+            setCurrentQuestionIndex(currentQuestionIndex+1);
+            setCurrentOptionSelected(null);   
+            setCorrectOption(null);
+            setIsOptionsDisabled(false);
+            setShowNextButton(false);
+            setCounter(15); 
+        }
         if(counter === 0) {
             setCurrentQuestionIndex(currentQuestionIndex+1);
             setCounter(15); 
@@ -171,7 +181,8 @@ export default function Question () {
     if (currentQuestionIndex + 1 > allQuestions.length) {
         setShowScoreModal(true)
         setCounter(null)
-        renderQuestion(undefined)         
+        renderQuestion(undefined)     
+        clearTimeout(interval);    
         
         
     }
@@ -183,8 +194,32 @@ export default function Question () {
         setCounter(15);
     }
  }, [currentQuestionIndex]);
+
+
    
-  
+
+const saveScore = async (score) => {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) {
+        console.error("Token manquant !");
+        return;
+    }
+
+    try {
+        const response = axios.post("http://192.168.1.17:3000/api/auth/save-score", {
+            token,
+            score
+        });
+
+        console.log("Réponse de sauvegarde :", response.data);
+        navigation.navigate('Welcome')
+    } catch (error) {
+        console.error("Erreur lors de la sauvegarde du score :", error.response ? error.response.data : error.message);
+    }
+}
+
+
+//console.log('SCORE cest la', score);
 
     return (
        <SafeAreaView style={styles.container}>
@@ -206,6 +241,8 @@ export default function Question () {
 
             {/* Next Button */}
             {renderNextButton()}
+
+            
 
 
             {/* Stoptime feature */}
@@ -238,11 +275,9 @@ export default function Question () {
                         </View>
                         {/* Retry Quiz button */}
 
-                         <Button title="Retry Quiz" style={styles.design2}   onPress={restartQuiz}> 
-                           
-                         {/* <Text style={styles.retrydesign} > Retry Quiz </Text> */}
+                         <Button title="Retry Quiz" style={styles.design2}   onPress={restartQuiz}> </Button> 
 
-                         </Button> 
+                         <Button title="Back to welcome page" style={styles.design2}   onPress={() => saveScore(score)}></Button>
 
                     </View> 
 

@@ -25,7 +25,8 @@ export default function SignUpScreen ({navigation}) {
   // Function register
 
   const [email, setEmail] = useState('');
-    const [password, setPassword] = useState(''); 
+  const [password, setPassword] = useState(''); 
+  const [name, setName] = useState('');
 
 
      console.log('EMAIL', email);
@@ -35,9 +36,10 @@ export default function SignUpScreen ({navigation}) {
      Axios.post("http://192.168.1.17:3000/api/auth/signup/" /*  Axios.post("http://192.168.1.112:3000/api/auth/signup/" */, {
       email: email,
       password: password,
+      name: name
     }).then((response) => {
       console.log(response)
-      navigation.navigate('Question')
+      navigation.navigate('Home')
       
     }).catch(function(error) {
       console.log(error.response.message);
@@ -72,7 +74,10 @@ export default function SignUpScreen ({navigation}) {
 
         <View style={styles.inputContainer} >
         <Ionicons name="person-outline" size={20} color= '#666' style={{marginRight: 5}} />
-        <TextInput style={styles.input} placeholder={'Rentrez votre nom complet'} />
+        <TextInput style={styles.input} placeholder={'Rentrez votre nom complet'}
+              value={name}
+              onChangeText= {setName}
+        />
         </View>
 
         <View style={styles.inputContainer} >

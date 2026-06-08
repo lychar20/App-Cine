@@ -4,9 +4,12 @@ import { Button, StyleSheet, Text, TextInput, View, Image, Alert } from 'react-n
 import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons'
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+
+
 import Twitter from "./icons/Twitter.png";
 
-import Axios from "axios"
+import Axios, { all } from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import { LogInScreen } from "./signIn";
 
@@ -19,6 +22,7 @@ import axios from "axios";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
 
 
+import { socket } from './socket/index.js';
 
 export default function Home({ navigation }) {
 
@@ -43,26 +47,58 @@ export default function Home({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
 
+
+
+  
+
     console.log('EMAIL', email);
     console.log('PASSWORD', password);
 
-  const OnSignIn = () => {
-     Axios.post("http://192.168.1.17:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
-      email: email,
-      password: password,
-    }).then((response) => {
-      console.log(response)
-      navigation.navigate('Question')
 
-    }).catch(function(error) {
-      console.log("ERROR", error.response.data);
-    });
+    useEffect(() => {
+      // Écoutez les réponses du serveur
+      socket.on("receive_answer", (data) => {
+        console.log("Réponse reçue:", data);
+      });
+  
+      // Nettoyez l'écouteur lors du démontage du composant
+      return () => {
+        socket.off("receive_answer");
+      };
+    }, []);
+ 
+
+  
+
+  const OnSignIn = () => {
+
+  
+    if (!email || !password) {
+      alert("Veuillez remplir tous les champs");
+    } else {
+
+      Axios.post("http://192.168.1.17:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
+        email: email,
+        password: password,
+      }).then((response) => {
+        console.log("ICI", response.data.data)
+        AsyncStorage.setItem('token', JSON.stringify(response.data.data));
+        navigation.navigate('Welcome')
+        
+  
+      }).catch(function(error) {
+        console.log("ERROR", error.response.data);
+      });
+
+    }
+
+
+   
 
   
 
   }
      
-
 
     return (
       <View style={styles.container}>
@@ -73,7 +109,7 @@ export default function Home({ navigation }) {
         {/* Zone de saisie */}
 
         <View style={styles.inputContainer} >
-        <Entypo name="email" size={20} color= '#666' style={{marginRight: 5}} />
+        <Entypo name="email"  size={20} color= '#666' style={{marginRight: 5}} />
         <TextInput style={styles.input} 
         placeholder={'Entrer votre email'}
         value={email}
@@ -111,6 +147,7 @@ export default function Home({ navigation }) {
         <TouchableOpacity style={styles.touchableButton} onPress=  {OnSignIn}   /*  {() => navigation.navigate('Question') }   */  >
           <Text style={styles.touchableText} >Me connecter</Text>
         </TouchableOpacity>
+
 
         {/* <Button title='Appuyer ici pour commencer'   onPress=  {() => navigation.navigate('Question') } style={styles.buttondesign} /> */}
 

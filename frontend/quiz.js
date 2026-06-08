@@ -3,8 +3,9 @@ import {StyleSheet, Text, TextInput, View, SafeAreaView, StatusBar, Modal, Butto
 import { TouchableOpacity } from "react-native-gesture-handler";
 import data from "./data";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Quiz () {
+export default function Quiz ({ navigation }) {
 
     const allQuestions = data;
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -15,6 +16,18 @@ export default function Quiz () {
     const [showNextButton, setShowNextButton] = useState(false)
     const [showScoreModal, setShowScoreModal] = useState(false)
 
+
+    async function getStart() {
+        setShowScoreModal(false);
+
+        setCurrentQuestionIndex(0);
+        setScore(0);
+
+        setCurrentOptionSelected(null);   
+        setCorrectOption(null);
+        setIsOptionsDisabled(false);
+        setShowNextButton(false);
+    }
 
     const validateAnswer = (selectedOption) => {
         let correct_option = allQuestions[currentQuestionIndex]['correct_option'];
@@ -53,6 +66,21 @@ export default function Quiz () {
         setCorrectOption(null);
         setIsOptionsDisabled(false);
         setShowNextButton(false);
+    }
+
+    const backToWelcomePage = () => {
+
+        setShowScoreModal(false);
+
+        setCurrentQuestionIndex(0);
+       // setScore(0);
+
+        setCurrentOptionSelected(null);   
+        setCorrectOption(null);
+        setIsOptionsDisabled(false);
+        setShowNextButton(false);
+        navigation.navigate('Welcome');
+
     }
 
     const renderQuestion = () => {
@@ -120,6 +148,16 @@ export default function Quiz () {
         }
     }
 
+
+
+  useEffect(() => {
+        getStart();
+    }, []); 
+
+
+    AsyncStorage.setItem('Score', JSON.stringify({score}));
+console.log('SCORE', score);
+
     return (
        <SafeAreaView style={styles.container}>
 
@@ -160,11 +198,11 @@ export default function Quiz () {
                         </View>
                         {/* Retry Quiz button */}
 
-                         <Button title="Retry Quiz" style={styles.design2}   onPress={restartQuiz}> 
-                           
-                         {/* <Text style={styles.retrydesign} > Retry Quiz </Text> */}
+                        
 
-                         </Button> 
+
+
+                         <Button title="Back to welcome page" style={styles.design2} onPress={backToWelcomePage}> </Button> 
 
                     </View> 
 
@@ -176,7 +214,10 @@ export default function Quiz () {
         </View>
 
        </SafeAreaView>
+
     )
+    
+    
 }
 
 
@@ -306,3 +347,15 @@ const styles = StyleSheet.create({
         fontSize: 20,
     }
   });
+
+
+
+
+   
+
+
+
+
+
+
+  
