@@ -4,6 +4,7 @@ import { initializeSocket } from "./socket/socket.js";
 import app from './app.js';
 
 
+
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -37,9 +38,6 @@ const errorHandler = error => {
       throw error;
   }
 };
-
-/* const websocketServer = require("websocket").server;
-const httpServer = http.createServer(app); */
 
 const server = createServer(app);
 //const io = new Server(server);
