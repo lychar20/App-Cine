@@ -4,7 +4,7 @@ import { NativeRouter, Route, Routes, Link } from "react-router-native";
 import React from "react";
 
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator as createStackNavigator } from "@react-navigation/native-stack";
 
 import Home from "./home";
 import Question from "./questions";

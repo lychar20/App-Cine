@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {StyleSheet, Text, TextInput, View, SafeAreaView, StatusBar, Modal, Button, TouchableHighlight} from 'react-native';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import data from "./data";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import StopTime from "./stopTime";
 
 //import { Stopwatch, Timer } from 'react-native-stopwatch-timer';

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, TextInput, View, Image, Alert } from 'react-native';
-import Entypo from 'react-native-vector-icons/Entypo'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons'
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import Twitter from "./icons/Twitter.png";
 
 import Axios from "axios"
 
-import { LogInScreen } from "./signIn";
+// import { LogInScreen } from "./signIn";
 
-import {useRouter} from "expo-router";
 import axios from "axios";
 
 

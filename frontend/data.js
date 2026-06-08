@@ -1,6 +1,6 @@
 
 
-export default data = [
+const data = [
 {
     question: "What's the biggest planet in our solar system?",
     options: ["Jupiter", "Saurn", "Neptune", "Mercury"],
@@ -28,3 +28,4 @@ export default data = [
 }
 
 ]
+export default data;

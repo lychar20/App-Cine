@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from 'expo-status-bar';
 import { Button, Modal, StyleSheet, Text, TextInput, View, Image, SafeAreaView, ScrollView } from 'react-native';
-import Entypo from 'react-native-vector-icons/Entypo'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import { Entypo, MaterialCommunityIcons, Ionicons, AntDesign } from '@expo/vector-icons'
 import { TouchableOpacity } from "react-native-gesture-handler";
 //import DatePicker from "react-native-date-picker";
 
