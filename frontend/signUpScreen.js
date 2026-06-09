@@ -13,6 +13,7 @@ import DatePicker from 'react-native-modern-datepicker';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';  */
 
 import Axios from "axios"
+import { API_URL } from './config.js';
 
 
 
@@ -33,7 +34,7 @@ export default function SignUpScreen ({navigation}) {
     console.log('PASSWORD', password);
 
   const Register = () => {
-     Axios.post("http://192.168.1.17:3000/api/auth/signup/" /*  Axios.post("http://192.168.1.112:3000/api/auth/signup/" */, {
+     Axios.post(`${API_URL}/api/auth/signup/`, {
       email: email,
       password: password,
       name: name

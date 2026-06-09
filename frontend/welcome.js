@@ -6,6 +6,7 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import { Axios } from 'axios';
 import axios from 'axios'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5'
+import { API_URL } from './config.js';
 
 
 
@@ -39,7 +40,7 @@ export default function Welcome({ navigation }) {
         }
 
         axios
-      .post("http://192.168.1.17:3000/api/auth/userdata/", {token: token})
+      .post(`${API_URL}/api/auth/userdata/`, {token: token})
       .then(res => {
         console.log("ULTIME", res.data);
         setUserData(res.data.data);
@@ -63,7 +64,7 @@ export default function Welcome({ navigation }) {
       
           try {
               // Modifiez ici pour envoyer le token en tant que paramètre de requête
-        const response = await axios.get(`http://192.168.1.17:3000/api/auth/get-latest-score`, {
+        const response = await axios.get(`${API_URL}/api/auth/get-latest-score`, {
           headers: {
               Authorization: `Bearer ${token}` // Ajoutez le token dans les en-têtes
           }

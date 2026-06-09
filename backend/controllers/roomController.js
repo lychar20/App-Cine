@@ -1,5 +1,5 @@
 /* //import { Request, Response } from "express";
-import * as RoomService from "../services/roomService";
+import * as RoomService from "../services/roomService.js";
 
 export const createRoom = async (req, res) => {
   const { category, userId, userName } = req.body;
@@ -35,13 +35,13 @@ export const deleteRoom = async (userId: string) => {
 }; */
 
 //import { Request, Response } from "express";
-import * as RoomService from "../services/roomService"
+import * as RoomService from "../services/roomService.js"
 
 export const createRoom = async (req, res) => {
-  const { category, userId, userName } = req.body
+  const { category, categoryId, userId, userName } = req.body
 
   try {
-    const room = await RoomService.createRoom({ category, userId, userName })
+    const room = await RoomService.createRoom({ category, categoryId, userId, userName })
     res.send({ status: "ok", roomId: room._id })
   } catch (error) {
     const typedError = error

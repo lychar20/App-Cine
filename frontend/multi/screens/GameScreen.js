@@ -3,6 +3,7 @@ import React, {useEffect, useState } from 'react'
 import { useRoute } from '@react-navigation/native';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from 'axios';
+import { API_URL } from '../../config.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function GameScreen ({ navigation }) {
@@ -38,7 +39,7 @@ export default function GameScreen ({ navigation }) {
         }
 
         try {
-            const res = await axios.post("http://192.168.1.17:3000/api/auth/userdata/", { token });
+            const res = await axios.post(`${API_URL}/api/auth/userdata/`, { token });
             console.log("Données utilisateur reçues:", res.data);
             setUserData(res.data.data);
         } catch (error) {
@@ -55,7 +56,7 @@ export default function GameScreen ({ navigation }) {
 
     async function saveRoomInDatabase(category, userId, userName, categoryId) {
         try {
-          const response = await axios.post('http://192.168.1.17:3000/api/auth/rooms/', {
+          const response = await axios.post(`${API_URL}/api/auth/rooms/`, {
             category,
             userId,
             userName,

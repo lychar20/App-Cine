@@ -1,13 +1,14 @@
 import { View, Text, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from './config.js';
 
 export default function ScoreSheet () {
     const [scores, setScores] = useState([]);
 
     const getUserNameById = async (userId) => {
         try {
-            const response = await axios.get(`http://192.168.1.17:3000/api/auth/get-user/${userId}`);
+            const response = await axios.get(`${API_URL}/api/auth/get-user/${userId}`);
             return response.data.name; // Retourner le nom de l'utilisateur
         } catch (error) {
             console.error("Erreur lors de la récupération de l'utilisateur", error);
@@ -18,7 +19,7 @@ export default function ScoreSheet () {
 
       const allScore = async () => {
         try {
-            const response = await axios.get(`http://192.168.1.17:3000/api/auth/get-all-score`);
+            const response = await axios.get(`${API_URL}/api/auth/get-all-score`);
             console.log("TOUS LES SCORES", response.data);
 
             // Récupérer les noms des utilisateurs

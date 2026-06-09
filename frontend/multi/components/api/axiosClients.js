@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { API_URL } from '../../../config.js';
 
 
 // the main api's url
 const mainAxiosClient = axios.create({
-  baseURL: 'http://192.168.1.17:3000/',
+  baseURL: `${API_URL}/`,
   timeout: 10000,
 });
 

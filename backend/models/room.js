@@ -14,10 +14,10 @@ const RoomSchema: Schema = new Schema(
     userName: { type: String, required: true },
     host: {
       type: Schema.Types.ObjectId,
-      ref: "RegisteredUsers",
+      ref: "User",
       required: true,
     },
-    players: [{ type: Schema.Types.ObjectId, ref: "RegisteredUsers" }],
+    players: [{ type: Schema.Types.ObjectId, ref: "User" }],
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
@@ -31,13 +31,14 @@ import mongoose, { Schema } from "mongoose"
 const RoomSchema = new Schema(
   {
     category: { type: String, required: true },
+    categoryId: { type: Number },
     userName: { type: String, required: true },
     host: {
       type: Schema.Types.ObjectId,
-      ref: "RegisteredUsers",
+      ref: "User",
       required: true
     },
-    players: [{ type: Schema.Types.ObjectId, ref: "RegisteredUsers" }],
+    players: [{ type: Schema.Types.ObjectId, ref: "User" }],
     isActive: { type: Boolean, default: true }
   },
   { timestamps: true }

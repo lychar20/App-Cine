@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import StopTime from "./stopTime";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_URL } from './config.js';
 
 //import { Stopwatch, Timer } from 'react-native-stopwatch-timer';
 
@@ -206,7 +207,7 @@ const saveScore = async (score) => {
     }
 
     try {
-        const response = axios.post("http://192.168.1.17:3000/api/auth/save-score", {
+        const response = axios.post(`${API_URL}/api/auth/save-score`, {
             token,
             score
         });

@@ -1,5 +1,5 @@
 /*import { Socket } from "socket.io";
-import Room from "../../models/room";
+import Room from "../../models/room.js";
 
 export const registerRoomHandlers = (socket: Socket) => {
   socket.on("create_room", (roomId) => {
@@ -29,7 +29,7 @@ const deleteRoomByHostID = async (hostID: string) => {
   }
 }; */
 
-import Room from "../../models/room"
+import Room from "../../models/room.js"
 
 export const registerRoomHandlers = socket => {
   socket.on("create_room", roomId => {

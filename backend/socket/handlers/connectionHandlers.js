@@ -1,5 +1,5 @@
 /*import { Socket } from "socket.io";
-import { deleteRoom } from "../../controllers/roomController";
+import { deleteRoom } from "../../controllers/roomController.js";
 
 export const registerConnectionHandlers = (socket: Socket) => {
   socket.on("on_connect", (msg) => {
@@ -13,7 +13,7 @@ export const registerConnectionHandlers = (socket: Socket) => {
   });
 }; */
 
-import { deleteRoom } from "../../controllers/roomController"
+import { deleteRoom } from "../../controllers/roomController.js"
 
 export const registerConnectionHandlers = socket => {
   socket.on("on_connect", msg => {

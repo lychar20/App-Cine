@@ -10,6 +10,7 @@ import Twitter from "./icons/Twitter.png";
 
 import Axios, { all } from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from './config.js';
 
 // import { LogInScreen } from "./signIn";
 
@@ -77,7 +78,7 @@ export default function Home({ navigation }) {
       alert("Veuillez remplir tous les champs");
     } else {
 
-      Axios.post("http://192.168.1.17:3000/api/auth/login/"  /* Axios.post("http://192.168.1.112:3000/api/auth/login/" */, {
+      Axios.post(`${API_URL}/api/auth/login/`, {
         email: email,
         password: password,
       }).then((response) => {

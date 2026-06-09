@@ -3,6 +3,7 @@ import React,  { useEffect, useState } from 'react'
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {colorList} from '../constants/colors';
 import axios from 'axios';
+import { API_URL } from '../../config.js';
 
 
 
@@ -16,19 +17,18 @@ export default function MultiplayerLobbyScreen({ navigation }) {
   useEffect(() => {
     const fetchActiveRooms = async () => {
         try {
-            const response = await axios.get('http://192.168.1.17:3000/api/auth/active/');
-            console.log("Salles actives:", response.data.rooms); // Log des salles
-
-            if (response.data.rooms.length > 0) {
-              // Assurez-vous que toutes les salles ont la même catégorie et récupérez le premier
-              setActiveRooms(response.data.rooms);
-          }
+            const response = await axios.get(`${API_URL}/api/auth/active/`);
+            console.log("Salles actives:", response.data.rooms);
+            setActiveRooms(response.data.rooms || []);
         } catch (error) {
             console.error("Erreur lors de la récupération des salles actives:", error);
         }
     };
 
-    fetchActiveRooms();
+    fetchActiveRooms(); // premier chargement immédiat
+    const interval = setInterval(fetchActiveRooms, 3000); // rafraîchissement toutes les 3 secondes
+
+    return () => clearInterval(interval); // nettoyage à la sortie de l'écran
 }, []);
 
  

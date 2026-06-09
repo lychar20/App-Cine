@@ -7,9 +7,9 @@ import { io } from "socket.io-client";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import data from '../../data';
+import { API_URL } from '../../config.js';
 
-const serverEndpoint = "http://192.168.1.17:3000"; 
-const socket = io(serverEndpoint); 
+const socket = io(API_URL);
 
 export default function PlayOn({ navigation }) {
     const route = useRoute();
@@ -36,7 +36,7 @@ export default function PlayOn({ navigation }) {
         }
 
         try {
-            const res = await axios.post("http://192.168.1.17:3000/api/auth/userdata/", { token });
+            const res = await axios.post(`${API_URL}/api/auth/userdata/`, { token });
             console.log("Données utilisateur reçues:", res.data);
             setUserData(res.data.data);
         } catch (error) {
@@ -47,6 +47,13 @@ export default function PlayOn({ navigation }) {
 
         getInfo();
     }, []);
+
+    // Charger les questions dès l'arrivée sur l'écran
+    useEffect(() => {
+        if (categoryId) {
+            fetchData();
+        }
+    }, [categoryId]);
 
 
 
@@ -79,11 +86,6 @@ export default function PlayOn({ navigation }) {
             socket.on("userCountUpdated", (count) => {
                 setUserCount(count);
                 console.log("USERCOUNT", count);
-                if (count > 1  && !isGameStarted) {
-                  //  fetchData(); // Récupérer les questions lorsque deux utilisateurs sont présents
-                        whloeRender();
-                        setIsGameStarted(true);
-                } 
             });
 
             socket.on("userFinished", ({ userId }) => {
@@ -107,26 +109,46 @@ export default function PlayOn({ navigation }) {
         };
     }, [userData, roomId]);
 
+    // Démarrer la partie seulement quand userData ET userCount > 1 sont prêts
+    useEffect(() => {
+        if (userCount > 1 && userData && !isGameStarted) {
+            whloeRender();
+            setIsGameStarted(true);
+        }
+    }, [userCount, userData]);
+
+    // Sauvegarder le score dès que showScoreModal ET userData sont prêts
+    useEffect(() => {
+        if (showScoreModal && userData) {
+            saveScore(score);
+        }
+    }, [showScoreModal, userData]);
+
+
 
     //Fetch questions
 
-/*     const fetchData = async () => {
+     const fetchData = async () => {
         const amount = 10; // Par exemple, le nombre de questions que vous voulez
         const url = `https://opentdb.com/api.php?amount=${amount}&category=${categoryId}`;
 
         try {
             const response = await axios.get(url);
             console.log("Données récupérées:", response.data);
-            setQuestions(response.data.results);
-            // Traitez les données ici
+            const formattedQuestions = response.data.results.map(q => ({
+                question: q.question,
+                options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
+                correct_answer: q.correct_answer
+            }));
+            setQuestions(formattedQuestions);
         } catch (error) {
             console.error("Erreur lors de la récupération des données:", error);
         }
-    }; */
+    }; 
 
     //questions from data
 
-    const allQuestions = data;
+    const allQuestions = questions;
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
     const [currentOptionSelected, setCurrentOptionSelected] = useState(null);
     const [correctOption, setCorrectOption] = useState(null);
@@ -166,11 +188,11 @@ const startGame = () => {
 
 
     const validateAnswer = (selectedOption) => {
-        let correct_option = allQuestions[currentQuestionIndex]['correct_option'];
+        let correct_answer = allQuestions[currentQuestionIndex]['correct_answer'];
         setCurrentOptionSelected(selectedOption);
-        setCorrectOption(correct_option);
+        setCorrectOption(correct_answer);
         setIsOptionsDisabled(true);
-        if(selectedOption==correct_option){
+        if(selectedOption==correct_answer){
             // Set Score
             setScore(score+1)
         }
@@ -342,13 +364,13 @@ return null;
         }
 
         try {
-            const response = await axios.post("http://192.168.1.17:3000/api/auth/save-score", { token, score });
+            const response = await axios.post(`${API_URL}/api/auth/save-score`, { token, score });
             console.log("Réponse de sauvegarde :", response.data);
 
             //deconnexion du user
             socket.emit("leaveRoom", { roomId, userId: userData._id }); // Émettre l'événement de déconnexion
 
-            navigation.navigate('Welcome');
+          //  navigation.navigate('Welcome');
 
 
         } catch (error) {
@@ -433,7 +455,7 @@ return (
                     </View>
                     {/* Bouton pour revenir à la page d'accueil */}
                     {finishedUsers.length === userCount && (
-                    <Button title="Back to welcome page" style={styles.buttonStyle} onPress={() => saveScore(score)} />
+                    <Button title="Back to welcome page" style={styles.buttonStyle} onPress={() => navigation.navigate('Welcome')} />
                     )}
                 </View>
             </View>

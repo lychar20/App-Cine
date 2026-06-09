@@ -1,4 +1,4 @@
-/*import Room from "../models/room";
+/*import Room from "../models/room.js";
 import mongoose from "mongoose";
 
 interface CreateRoomInput {
@@ -34,14 +34,15 @@ export const deleteRoomByUserId = async (userId: string) => {
 }; */
 
 
-import Room from "../models/room"
+import Room from "../models/room.js"
 import mongoose from "mongoose"
 
-export const createRoom = async ({ category, userId, userName }) => {
+export const createRoom = async ({ category, categoryId, userId, userName }) => {
   const objectId = new mongoose.Types.ObjectId(userId)
 
   const room = new Room({
     category: category,
+    categoryId: categoryId,
     userName,
     host: objectId,
     players: [objectId]
