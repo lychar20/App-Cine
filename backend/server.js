@@ -2,6 +2,7 @@ import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { initializeSocket } from "./socket/socket.js";
 import app from './app.js';
+import Room from './models/room.js';
 
 
 
@@ -95,14 +96,20 @@ server.on('listening', () => {
   });
 
 
-    socket.on("leaveRoom", ({ roomId, userId }) => {
-      socket.leave(roomId); // L'utilisateur quitte la salle
+    socket.on("leaveRoom", async ({ roomId, userId }) => {
+      socket.leave(roomId);
       console.log(`${userId} a quitté la salle ${roomId}`);
 
-      // Mettre à jour le compteur d'utilisateurs
       if (usersInRooms[roomId]) {
-          usersInRooms[roomId] -= 1; // Décrémente le compteur
-          io.to(roomId).emit('userCountUpdated', usersInRooms[roomId]); // Émet le nombre d'utilisateurs
+          usersInRooms[roomId] -= 1;
+          io.to(roomId).emit('userCountUpdated', usersInRooms[roomId]);
+
+          // Si plus personne dans la room, on la supprime de la DB
+          if (usersInRooms[roomId] === 0) {
+              delete usersInRooms[roomId];
+              await Room.findByIdAndDelete(roomId);
+              console.log(`Room ${roomId} supprimée de la base de données`);
+          }
       }
    });
 
