@@ -28,6 +28,8 @@ app.use(express.json());
 
 dotenv.config();
 
+console.log('SECRET_DB présent:', !!process.env.SECRET_DB);
+
 mongoose.connect(process.env.SECRET_DB,
     { useNewUrlParser: true,
       useUnifiedTopology: true })
