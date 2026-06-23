@@ -83,6 +83,10 @@ server.on('listening', () => {
     usersInRooms[roomId] += 1; // Incrémente le compteur
     io.to(roomId).emit('userCountUpdated', usersInRooms[roomId]); // Émet le nombre d'utilisateurs
 
+    if (usersInRooms[roomId] >= 2) {
+        io.to(roomId).emit('gameReady');
+    }
+
        // Émettre un événement à tous les utilisateurs dans la salle
        socket.to(roomId).emit("userJoined", { userName });
               // Émettre un message à l'utilisateur qui vient de se connecter
