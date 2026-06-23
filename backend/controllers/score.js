@@ -10,33 +10,42 @@ const JWT_SECRET = 'RANDOM_TOKEN_SECRET'
 
 
 export const saveScore = async (req, res, next) => {
-    let { token, score } = req.body;
+    let { token, score, roomId } = req.body;
     token = token.replace(/"/g, "");
-    console.log("TOKEN TROIS", token);
-
 
     if (!token || score === undefined) {
         return res.status(400).json({ message: "Token ou score manquant" });
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET); // Vérifiez le token
-        const userId = decoded.userId; // Récupérez l'ID utilisateur
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const userId = decoded.userId;
 
-        // Enregistrez le score dans la base de données
-        const newScore = new Score({ userId, score });
+        const newScore = new Score({ userId, score, roomId: roomId || null });
         await newScore.save();
-        console.log("NEWSCORE", newScore);
 
-        console.log("Score reçu pour sauvegarde :", score);
         return res.status(201).json({ message: "Score sauvegardé avec succès" });
-
 
     } catch (error) {
         console.error("Erreur lors de la sauvegarde du score :", error);
         return res.status(500).json({ message: "Erreur lors de la sauvegarde du score" });
     }
+};
 
+export const getScoresByRoom = async (req, res, next) => {
+    const { roomId } = req.params;
+    try {
+        const scores = await Score.find({ roomId }).populate('userId', 'name').sort({ score: -1 });
+        const result = scores.map(s => ({
+            _id: s._id,
+            score: s.score,
+            userName: s.userId?.name || 'Joueur',
+        }));
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error("Erreur getScoresByRoom:", error);
+        return res.status(500).json({ message: "Erreur serveur" });
+    }
 };
 
 

@@ -3,9 +3,9 @@
 import mongoose from 'mongoose';
 
 const scoreSchema = mongoose.Schema({
-  //userId: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  score: { type: Number, required: true},
+  score: { type: Number, required: true },
+  roomId: { type: String, default: null },
 }, { timestamps: true });
 
 
