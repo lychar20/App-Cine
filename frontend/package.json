@@ -51,9 +51,6 @@
   "private": true,
   "overrides": {
     "react-native-vector-icons": "^10.0.0",
-    "expo-font": "~14.0.12",
-    "@expo/cli": {
-      "expo": "54.0.20"
-    }
+    "expo-font": "~14.0.12"
   }
 }

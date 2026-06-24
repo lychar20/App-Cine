@@ -29,6 +29,14 @@
     },
     "plugins": [
       "expo-asset"
-    ]
+    ],
+    "autolinking": {
+      "exclude": ["expo-dom-webview", "expo-log-box"]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "48a86dc6-1230-4523-9f0f-7d376280ec93"
+      }
+    }
   }
 }
