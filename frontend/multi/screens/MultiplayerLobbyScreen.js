@@ -18,7 +18,6 @@ export default function MultiplayerLobbyScreen({ navigation }) {
     const fetchActiveRooms = async () => {
         try {
             const response = await axios.get(`${API_URL}/api/auth/active/`);
-            console.log("Salles actives:", response.data.rooms);
             setActiveRooms(response.data.rooms || []);
         } catch (error) {
             console.error("Erreur lors de la récupération des salles actives:", error);

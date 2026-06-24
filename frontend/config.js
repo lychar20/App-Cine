@@ -1,1 +1,1 @@
-export const API_URL = "http://192.168.1.17:3000";
+export const API_URL = "https://app-cine-backend-0e77d9388da2.herokuapp.com";

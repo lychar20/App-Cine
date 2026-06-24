@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View, StatusBar, Modal, Button, TouchableHighlight, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
@@ -19,16 +19,15 @@ export default function PlayOn({ navigation }) {
 
     const [isGameStarted, setIsGameStarted] = useState(false);
 
-    console.log("HOST", host);
 
     // avoir les info du user connecté
     const [userData, setUserData] = useState(null);
     const [notification, setNotification] = useState(null);
+    const [joinedPlayers, setJoinedPlayers] = useState([]);
 
     useEffect(() => {
     async function getInfo() {
         const token = await AsyncStorage.getItem('token');
-        console.log('TOKEN est passé pour PlayOn', token);
         
 
         if (!token) {console.error("Token est manquant !");            
@@ -37,7 +36,6 @@ export default function PlayOn({ navigation }) {
 
         try {
             const res = await axios.post(`${API_URL}/api/auth/userdata/`, { token });
-            console.log("Données utilisateur reçues:", res.data);
             setUserData(res.data.data);
         } catch (error) {
             console.error("Error fetching user data", error);
@@ -67,11 +65,7 @@ export default function PlayOn({ navigation }) {
         if (userData) {
             // Écouter l'événement userJoined pour afficher l'alerte
             const handleUserJoined = ({ userName }) => {
-                Alert.alert(
-                    "Nouvel Utilisateur",
-                    `${userName} a rejoint la partie!`,
-                    [{ text: "OK", onPress: () => console.log("Alert dismissed") }],
-                );
+                setJoinedPlayers((prev) => [...prev, userName]);
             };
     
             socket.on("userJoined", handleUserJoined);
@@ -85,16 +79,10 @@ export default function PlayOn({ navigation }) {
             // compter les utilisateur
             socket.on("userCountUpdated", (count) => {
                 setUserCount(count);
-                console.log("USERCOUNT", count);
             });
 
-            socket.on("userFinished", ({ userId }) => {
-                setFinishedUsers((prev) => [...new Set([...prev, userId])]); 
-            });
-    
             // Nettoyage de l'effet, enlever l'écouteur
             return () => {
-                socket.off("userFinished");
                 socket.emit("leaveRoom", { roomId, userId: userData._id });
                 socket.off("userJoined", handleUserJoined);
                 socket.off("userCountUpdated");
@@ -109,20 +97,25 @@ export default function PlayOn({ navigation }) {
         };
     }, [userData, roomId]);
 
-    // Démarrer la partie seulement quand userData ET userCount > 1 sont prêts
+    // Démarrer la partie quand le serveur envoie gameReady
     useEffect(() => {
-        if (userCount > 1 && userData && !isGameStarted) {
-            whloeRender();
-            setIsGameStarted(true);
-        }
-    }, [userCount, userData]);
+        const handleGameReady = () => {
+            if (!isGameStarted) {
+                setTimeout(() => {
+                    setTotalPlayers(userCount);
+                    whloeRender();
+                    setIsGameStarted(true);
+                }, 3000);
+            }
+        };
 
-    // Sauvegarder le score dès que showScoreModal ET userData sont prêts
-    useEffect(() => {
-        if (showScoreModal && userData) {
-            saveScore(score);
-        }
-    }, [showScoreModal, userData]);
+        socket.on('gameReady', handleGameReady);
+
+        return () => {
+            socket.off('gameReady', handleGameReady);
+        };
+    }, [userData, isGameStarted, userCount]);
+
 
 
 
@@ -134,11 +127,35 @@ export default function PlayOn({ navigation }) {
 
         try {
             const response = await axios.get(url);
-            console.log("Données récupérées:", response.data);
+            const decodeHTML = (str) => {
+                return str
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#039;/g, "'")
+                    .replace(/&lrm;/g, '')
+                    .replace(/&rlm;/g, '')
+                    .replace(/&eacute;/g, 'é')
+                    .replace(/&egrave;/g, 'è')
+                    .replace(/&agrave;/g, 'à')
+                    .replace(/&uuml;/g, 'ü')
+                    .replace(/&ouml;/g, 'ö')
+                    .replace(/&auml;/g, 'ä')
+                    .replace(/&rsquo;/g, "'")
+                    .replace(/&lsquo;/g, "'")
+                    .replace(/&ldquo;/g, '"')
+                    .replace(/&rdquo;/g, '"')
+                    .replace(/&ndash;/g, '–')
+                    .replace(/&mdash;/g, '—')
+                    .replace(/&hellip;/g, '...')
+                    .replace(/&deg;/g, '°')
+                    .replace(/&pi;/g, 'π');
+            };
             const formattedQuestions = response.data.results.map(q => ({
-                question: q.question,
-                options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
-                correct_answer: q.correct_answer
+                question: decodeHTML(q.question),
+                options: [...q.incorrect_answers, q.correct_answer].map(decodeHTML).sort(() => Math.random() - 0.5),
+                correct_answer: decodeHTML(q.correct_answer)
             }));
             setQuestions(formattedQuestions);
         } catch (error) {
@@ -158,6 +175,11 @@ export default function PlayOn({ navigation }) {
     const [showScoreModal, setShowScoreModal] = useState(false)
 
     const [finishedUsers, setFinishedUsers] = useState([]);
+    const [totalPlayers, setTotalPlayers] = useState(0);
+    const hasSavedScore = React.useRef(false);
+    const gameEndHandled = React.useRef(false);
+    const finishedUsersRef = React.useRef(finishedUsers);
+    useEffect(() => { finishedUsersRef.current = finishedUsers; }, [finishedUsers]);
 
 
     const [counter, setCounter] = useState(10);
@@ -167,14 +189,42 @@ export default function PlayOn({ navigation }) {
 let interval = null;
 
 
-const whloeRender = () => { 
+const handleGameEnd = (finalScore) => {
+    if (gameEndHandled.current) return;
+    gameEndHandled.current = true;
+    console.log('GAME END - finalScore:', finalScore);
 
+    if (!hasSavedScore.current) {
+        hasSavedScore.current = true;
+        saveScore(finalScore);
+    }
+    socket.emit("userFinished", { roomId, userId: userData?._id, score: finalScore, userName: userData?.name });
+    setFinishedUsers((prev) => {
+        if (prev.find(u => u.userId === userData?._id)) return prev;
+        return [...prev, { userId: userData?._id, score: finalScore, userName: userData?.name }];
+    });
+    setShowScoreModal(true);
+
+    setTimeout(() => {
+        const latest = finishedUsersRef.current;
+        navigation.navigate('PartieScore', {
+            myScore: finalScore,
+            totalQuestions: allQuestions.length,
+            userName: userData?.name,
+            roomId,
+        });
+    }, 4000);
+};
+
+const whloeRender = () => {
+    gameEndHandled.current = false;
+    hasSavedScore.current = false;
     startGame();
 }
 
 
 const startGame = () => {
-    // Initialisez des états comme currentQuestionIndex, score, etc.
+    hasSavedScore.current = false;
     setCurrentQuestionIndex(0);
     setScore(0);
     setCurrentOptionSelected(null);
@@ -182,7 +232,7 @@ const startGame = () => {
     setIsOptionsDisabled(false);
     setShowNextButton(false);
     setCounter(10);
-    setFinishedUsers([])
+    setFinishedUsers([]);
     setShowScoreModal(false);
 };
 
@@ -202,12 +252,13 @@ const startGame = () => {
     }
 
     const handdleNext = () => {
+        console.log('NEXT - index:', currentQuestionIndex, '/ length:', allQuestions.length);
         if(currentQuestionIndex === allQuestions.length-1) {
-            socket.emit("userFinished", { roomId, userId: userData._id });
-            setFinishedUsers((prev) => [...prev, userData._id]);
-
-            setShowScoreModal(true)
-            clearTimeout(interval)
+            console.log('NEXT - dernière question, handleGameEnd');
+            const correct_answer = allQuestions[currentQuestionIndex]['correct_answer'];
+            const finalScore = currentOptionSelected === correct_answer ? score + 1 : score;
+            handleGameEnd(finalScore);
+            clearTimeout(interval);
             
         }else{
             setCurrentQuestionIndex(currentQuestionIndex+1);
@@ -220,10 +271,14 @@ const startGame = () => {
 
 
     useEffect(() => {
-        socket.on("userFinished", ({ userId }) => {
-            setFinishedUsers((prev) => [...prev, userId]); 
+        socket.on("userFinished", ({ userId, score, userName }) => {
+            setFinishedUsers((prev) => {
+                const already = prev.find(u => u.userId === userId);
+                if (already) return prev;
+                return [...prev, { userId, score, userName }];
+            });
         });
-    
+
         return () => {
             socket.off("userFinished");
         };
@@ -323,10 +378,12 @@ return null;
                     setCounter(10); 
                 }
                 if(counter === 0) {
+                    console.log('TIMER 0 - index:', currentQuestionIndex, '/ length:', allQuestions.length);
                     if (currentQuestionIndex < allQuestions.length - 1) {
                         setCurrentQuestionIndex(currentQuestionIndex + 1);
                     } else {
-                        setShowScoreModal(true); // Afficher la modal des scores
+                        console.log('TIMER 0 - dernière question, handleGameEnd');
+                        handleGameEnd(score);
                     }
                 }
             }
@@ -344,7 +401,7 @@ return null;
 
     useEffect(() => {
         if (allQuestions.length > 0 && currentQuestionIndex + 1 > allQuestions.length) {
-            setShowScoreModal(true);
+            handleGameEnd(score);
             setCounter(null);
             clearTimeout(interval);
         }
@@ -364,13 +421,7 @@ return null;
         }
 
         try {
-            const response = await axios.post(`${API_URL}/api/auth/save-score`, { token, score });
-            console.log("Réponse de sauvegarde :", response.data);
-
-            //deconnexion du user
-            socket.emit("leaveRoom", { roomId, userId: userData._id }); // Émettre l'événement de déconnexion
-
-          //  navigation.navigate('Welcome');
+            const response = await axios.post(`${API_URL}/api/auth/save-score`, { token, score, roomId });
 
 
         } catch (error) {
@@ -384,14 +435,17 @@ return null;
 // Loader
 
 const Loader = () => (
-    <View style={[styles.container, styles.horizontal]}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>En attente d'un autre utilisateur...</Text>
+    <View style={[styles.containerLoader, styles.horizontal]}>
+        <ActivityIndicator size={80} color="#0000ff" />
+        <Text style={styles.textLoader}>En attente des joueurs... ({userCount}/10)</Text>
+        {joinedPlayers.map((name, index) => (
+            <Text key={index} style={styles.joinedPlayerText}>✅ {name} a rejoint</Text>
+        ))}
     </View>
 );
 
-// Affichez le loader si le nombre d'utilisateurs est 1
-if (userCount === 1) {
+// Affichez le loader si la partie n'a pas encore commencé
+if (!isGameStarted) {
     return <Loader />;
 }
 
@@ -402,8 +456,6 @@ if (userCount === 1) {
 return (
     <View style={styles.container}>
         <Text style={styles.title}>PlayOn</Text>
-        <Text style={styles.infoText}>Room ID: {roomId}</Text>
-        <Text style={styles.infoText}>Category ID: {categoryId}</Text> {/* Affichez l'ID de la catégorie pour vérification */}
 
 
    {/*      <ScrollView>
@@ -438,28 +490,12 @@ return (
         {/* Compte à rebours */}
         <Text style={styles.counterText}>{counter}</Text>
 
-        {/* Modal des Scores */}
-        <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showScoreModal}
-        >
-            <View style={styles.modalContainer}>
-                <View style={styles.resultContainer}>
-                    <Text style={styles.resultMessage}>
-                        {score > (allQuestions.length / 2) ? 'Congratulations!' : 'Oops!'}
-                    </Text>
-                    <View style={styles.finalScoreContainer}>
-                        <Text style={styles.finalScore}>{score}</Text>
-                        <Text>/ {allQuestions.length}</Text>
-                    </View>
-                    {/* Bouton pour revenir à la page d'accueil */}
-                    {finishedUsers.length === userCount && (
-                    <Button title="Back to welcome page" style={styles.buttonStyle} onPress={() => navigation.navigate('Welcome')} />
-                    )}
-                </View>
+        {/* En attente des autres joueurs */}
+        {showScoreModal && (
+            <View style={styles.waitingOverlay}>
+                <Text style={styles.waitingText}>En attente des autres joueurs...</Text>
             </View>
-        </Modal>
+        )}
     </View>
  
     </View>
@@ -481,6 +517,25 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#282c34',
         padding: 20,
+    },
+    containerLoader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#fff',
+    },
+    textLoader: {
+        fontWeight: 'bold',
+        fontSize: 24,
+        textAlign: 'center',
+        padding: 20,
+    },
+    joinedPlayerText: {
+        fontSize: 18,
+        color: '#28a745',
+        fontWeight: 'bold',
+        marginTop: 8,
     },
     title: {
         fontSize: 24,
@@ -577,6 +632,18 @@ const styles = StyleSheet.create({
     buttonStyle: {
         backgroundColor: '#007bff',
         marginTop: 10,
+    },
+    waitingOverlay: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    waitingText: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
     },
     notification: {
         backgroundColor: '#007bff',

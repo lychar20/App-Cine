@@ -16,6 +16,7 @@ import CreateGameScreen from './multi/screens/CreateGameScreen';
 import GameScreen from './multi/screens/GameScreen';
 import AssezCRelou from './multi/screens/AssezCRelou';
 import PlayOn from './multi/screens/PlayOn';
+import PartieScore from './multi/screens/PartieScore';
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,7 @@ export default function App() {
           <Stack.Screen name="MultiplayerLobbyScreen" component={MultiplayerLobbyScreen} options={{headerShown: false}} />
           <Stack.Screen name="CreateGameScreen" component={CreateGameScreen} options={{headerShown: false}} />
           <Stack.Screen name="PlayOn" component={PlayOn} options={{headerShown: false}} />
+          <Stack.Screen name="PartieScore" component={PartieScore} options={{headerShown: false}} />
           <Stack.Screen name="AssezCRelou" component={AssezCRelou} options={{headerShown: false}} />
           <Stack.Screen name="GameScreen" component={GameScreen} options={{headerShown: false}} />
           <Stack.Screen name="ScoreSheet" component={ScoreSheet} options={{headerShown: false}} />
