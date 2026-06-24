@@ -83,7 +83,7 @@ server.on('listening', () => {
     usersInRooms[roomId] += 1; // Incrémente le compteur
     io.to(roomId).emit('userCountUpdated', usersInRooms[roomId]); // Émet le nombre d'utilisateurs
 
-    if (usersInRooms[roomId] >= 2) {
+    if (usersInRooms[roomId] >= 10) {
         io.to(roomId).emit('gameReady');
     }
 
@@ -94,9 +94,8 @@ server.on('listening', () => {
     });
 
 
-    socket.on("userFinished", ({ roomId, userId }) => {
-      // Émettre l'événement userFinished à tous les utilisateurs dans cette salle
-      socket.to(roomId).emit("userFinished", { userId });
+    socket.on("userFinished", ({ roomId, userId, score, userName }) => {
+      socket.to(roomId).emit("userFinished", { userId, score, userName });
   });
 
 
