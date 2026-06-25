@@ -174,8 +174,8 @@ export default function Home({ navigation }) {
 
         <View style= {styles.newAccount} >
           <Text style={{textAlign: 'center'}} > Nouveau ?</Text>
-          <TouchableOpacity>
-            <Text style={{color: '#0065ff', marginLeft: 5}} onPress=  {() => navigation.navigate('SignUpScreen') }  > Créer un compte </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
+            <Text style={{color: 'black', marginLeft: 5, textDecorationLine: 'underline', fontWeight: 'bold'}}> Créer un compte </Text>
           </TouchableOpacity>
           
         </View>
@@ -187,7 +187,7 @@ export default function Home({ navigation }) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'yellow',
+      backgroundColor: '#ADD8E6',
       //alignItems: 'center',
       justifyContent: 'center',
       paddingRight: 15,

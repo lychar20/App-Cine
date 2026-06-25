@@ -106,9 +106,9 @@ export default function Welcome({ navigation }) {
       
       
 
-    <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('Question') }    >
+    {/* <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('Question') }    >
             <Text style={styles.touchableText} >Commencer une partie</Text>
-    </TouchableOpacity>
+    </TouchableOpacity> */}
 
     <TouchableOpacity style={styles.touchableButton} onPress=  {() => navigation.navigate('MultiplayerLobbyScreen') }    >
             <Text style={styles.touchableText} >Multi joueur Trivia</Text>

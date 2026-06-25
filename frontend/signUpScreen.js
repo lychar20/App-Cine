@@ -202,7 +202,7 @@ export default function SignUpScreen ({navigation}) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'green',
+      backgroundColor: '#ADD8E6',
       //alignItems: 'center',
       justifyContent: 'center',
       paddingRight: 15,
