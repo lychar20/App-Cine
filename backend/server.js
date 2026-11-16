@@ -83,7 +83,7 @@ server.on('listening', () => {
     // Lancer la partie immédiatement si 10 joueurs
     if (usersInRooms[roomId] >= 10) {
         if (roomTimers[roomId]) {
-            clearTimeout(roomTimers[roomId]);
+            clearTimeout(roomTimers[roomId].timeout);
             delete roomTimers[roomId];
         }
         io.to(roomId).emit('gameReady', { totalPlayers: usersInRooms[roomId] });
@@ -91,14 +91,23 @@ server.on('listening', () => {
 
     // Démarrer le timer de 90s dès le 1er joueur
     if (usersInRooms[roomId] === 1 && !roomTimers[roomId]) {
-        io.to(roomId).emit('lobbyTimer', { seconds: 90 });
-        roomTimers[roomId] = setTimeout(() => {
-            if (usersInRooms[roomId] >= 2) {
-                console.log(`Room ${roomId}: timer expiré avec ${usersInRooms[roomId]} joueurs, démarrage`);
-                io.to(roomId).emit('gameReady', { totalPlayers: usersInRooms[roomId] });
-            }
-            delete roomTimers[roomId];
-        }, 90000);
+        roomTimers[roomId] = {
+            startedAt: Date.now(),
+            timeout: setTimeout(() => {
+                if (usersInRooms[roomId] >= 2) {
+                    console.log(`Room ${roomId}: timer expiré avec ${usersInRooms[roomId]} joueurs, démarrage`);
+                    io.to(roomId).emit('gameReady', { totalPlayers: usersInRooms[roomId] });
+                }
+                delete roomTimers[roomId];
+            }, 90000)
+        };
+    }
+
+    // Envoyer le temps restant à chaque joueur qui rejoint
+    if (roomTimers[roomId]) {
+        const elapsed = Math.floor((Date.now() - roomTimers[roomId].startedAt) / 1000);
+        const remaining = Math.max(0, 90 - elapsed);
+        io.to(roomId).emit('lobbyTimer', { seconds: remaining });
     }
 
        // Émettre un événement à tous les utilisateurs dans la salle
@@ -125,7 +134,7 @@ server.on('listening', () => {
           if (usersInRooms[roomId] === 0) {
               delete usersInRooms[roomId];
               if (roomTimers[roomId]) {
-                  clearTimeout(roomTimers[roomId]);
+                  clearTimeout(roomTimers[roomId].timeout);
                   delete roomTimers[roomId];
               }
               await Room.findByIdAndDelete(roomId);
