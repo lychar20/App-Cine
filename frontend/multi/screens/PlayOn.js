@@ -115,6 +115,14 @@ export default function PlayOn({ navigation }) {
             }
         };
 
+        socket.on('gameReady', handleGameReady);
+        return () => {
+            socket.off('gameReady', handleGameReady);
+        };
+    }, [userData, isGameStarted, userCount]);
+
+    // Countdown lobby — useEffect séparé sans dépendances qui changent
+    useEffect(() => {
         const handleLobbyTimer = ({ seconds }) => {
             if (lobbyIntervalRef.current) {
                 clearInterval(lobbyIntervalRef.current);
@@ -133,17 +141,14 @@ export default function PlayOn({ navigation }) {
             }, 1000);
         };
 
-        socket.on('gameReady', handleGameReady);
         socket.on('lobbyTimer', handleLobbyTimer);
-
         return () => {
-            socket.off('gameReady', handleGameReady);
             socket.off('lobbyTimer', handleLobbyTimer);
             if (lobbyIntervalRef.current) {
                 clearInterval(lobbyIntervalRef.current);
             }
         };
-    }, [userData, isGameStarted, userCount]);
+    }, []);
 
 
 
