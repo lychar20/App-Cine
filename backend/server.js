@@ -56,14 +56,11 @@ server.on('listening', () => {
 }) */
 
   const usersInRooms = {}; // Object to keep track of users in each room
+  const roomTimers = {}; // Timers de démarrage automatique par room
 
   io.on("connection", (socket) => {
    console.log("Nouvelle connexion établie"); // Message de confirmation
-    //console.log(`Bivenue(e) dans le grooupe`); // Message de confirmation
     initializeSocket(socket); // Initialisez vos gestionnaires de socket
-
-
-    //Remplace initialisationSocket
 
     // userwelcome
     socket.emit("message", `Bienvenue(e) dans le groupe ${socket.id}`)
@@ -74,7 +71,7 @@ server.on('listening', () => {
      // Écoute de l'événement pour rejoindre une salle
       socket.on("joinRoom", ({ roomId, userName,  userId }) => {
       socket.join(roomId); // L'utilisateur rejoint la salle spécifiée
-      console.log(`${userName} a rejoint la salle ${roomId}`); 
+      console.log(`${userName} a rejoint la salle ${roomId}`);
 
        // Mettre à jour le compteur d'utilisateurs
        if (!usersInRooms[roomId]) {
@@ -83,8 +80,25 @@ server.on('listening', () => {
     usersInRooms[roomId] += 1; // Incrémente le compteur
     io.to(roomId).emit('userCountUpdated', usersInRooms[roomId]); // Émet le nombre d'utilisateurs
 
+    // Lancer la partie immédiatement si 10 joueurs
     if (usersInRooms[roomId] >= 10) {
-        io.to(roomId).emit('gameReady');
+        if (roomTimers[roomId]) {
+            clearTimeout(roomTimers[roomId]);
+            delete roomTimers[roomId];
+        }
+        io.to(roomId).emit('gameReady', { totalPlayers: usersInRooms[roomId] });
+    }
+
+    // Démarrer le timer de 90s dès le 1er joueur
+    if (usersInRooms[roomId] === 1 && !roomTimers[roomId]) {
+        io.to(roomId).emit('lobbyTimer', { seconds: 90 });
+        roomTimers[roomId] = setTimeout(() => {
+            if (usersInRooms[roomId] >= 2) {
+                console.log(`Room ${roomId}: timer expiré avec ${usersInRooms[roomId]} joueurs, démarrage`);
+                io.to(roomId).emit('gameReady', { totalPlayers: usersInRooms[roomId] });
+            }
+            delete roomTimers[roomId];
+        }, 90000);
     }
 
        // Émettre un événement à tous les utilisateurs dans la salle
@@ -110,6 +124,10 @@ server.on('listening', () => {
           // Si plus personne dans la room, on la supprime de la DB
           if (usersInRooms[roomId] === 0) {
               delete usersInRooms[roomId];
+              if (roomTimers[roomId]) {
+                  clearTimeout(roomTimers[roomId]);
+                  delete roomTimers[roomId];
+              }
               await Room.findByIdAndDelete(roomId);
               console.log(`Room ${roomId} supprimée de la base de données`);
           }
