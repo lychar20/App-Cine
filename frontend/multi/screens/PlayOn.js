@@ -116,6 +116,10 @@ export default function PlayOn({ navigation }) {
         };
 
         const handleLobbyTimer = ({ seconds }) => {
+            if (lobbyIntervalRef.current) {
+                clearInterval(lobbyIntervalRef.current);
+                lobbyIntervalRef.current = null;
+            }
             setLobbyCountdown(seconds);
             lobbyIntervalRef.current = setInterval(() => {
                 setLobbyCountdown((prev) => {
