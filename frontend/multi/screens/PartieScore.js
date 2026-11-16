@@ -6,7 +6,7 @@ import { API_URL } from '../../config.js';
 
 export default function PartieScore({ navigation }) {
     const route = useRoute();
-    const { myScore, totalQuestions, userName, roomId } = route.params;
+    const { myScore, totalQuestions, userName, roomId, totalPlayers } = route.params;
 
     const [players, setPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ export default function PartieScore({ navigation }) {
                 const data = response.data;
                 setPlayers(data);
 
-                if (data.length >= 10 || attempts >= maxAttempts) {
+                if (data.length >= (totalPlayers || 2) || attempts >= maxAttempts) {
                     setLoading(false);
                 } else {
                     setTimeout(fetchScores, 2000);
@@ -64,7 +64,7 @@ export default function PartieScore({ navigation }) {
                 />
             )}
 
-            {players.length >= 10 && (
+            {players.length >= (totalPlayers || 2) && (
                 <Text style={styles.winnerText}>
                     {players[0].userName?.trim() === userName?.trim()
                         ? '🏆 Bravo, vous avez gagné !'

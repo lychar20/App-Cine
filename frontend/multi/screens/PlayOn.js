@@ -18,6 +18,8 @@ export default function PlayOn({ navigation }) {
     const [userCount, setUserCount] = useState(0);
 
     const [isGameStarted, setIsGameStarted] = useState(false);
+    const [lobbyCountdown, setLobbyCountdown] = useState(null);
+    const lobbyIntervalRef = React.useRef(null);
 
 
     // avoir les info du user connecté
@@ -99,20 +101,43 @@ export default function PlayOn({ navigation }) {
 
     // Démarrer la partie quand le serveur envoie gameReady
     useEffect(() => {
-        const handleGameReady = () => {
+        const handleGameReady = ({ totalPlayers: total }) => {
             if (!isGameStarted) {
+                if (lobbyIntervalRef.current) {
+                    clearInterval(lobbyIntervalRef.current);
+                    lobbyIntervalRef.current = null;
+                }
                 setTimeout(() => {
-                    setTotalPlayers(userCount);
+                    setTotalPlayers(total || userCount);
                     whloeRender();
                     setIsGameStarted(true);
                 }, 3000);
             }
         };
 
+        const handleLobbyTimer = ({ seconds }) => {
+            setLobbyCountdown(seconds);
+            lobbyIntervalRef.current = setInterval(() => {
+                setLobbyCountdown((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(lobbyIntervalRef.current);
+                        lobbyIntervalRef.current = null;
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        };
+
         socket.on('gameReady', handleGameReady);
+        socket.on('lobbyTimer', handleLobbyTimer);
 
         return () => {
             socket.off('gameReady', handleGameReady);
+            socket.off('lobbyTimer', handleLobbyTimer);
+            if (lobbyIntervalRef.current) {
+                clearInterval(lobbyIntervalRef.current);
+            }
         };
     }, [userData, isGameStarted, userCount]);
 
@@ -212,6 +237,7 @@ const handleGameEnd = (finalScore) => {
             totalQuestions: allQuestions.length,
             userName: userData?.name,
             roomId,
+            totalPlayers,
         });
     }, 4000);
 };
@@ -438,6 +464,13 @@ const Loader = () => (
     <View style={[styles.containerLoader, styles.horizontal]}>
         <ActivityIndicator size={80} color="#0000ff" />
         <Text style={styles.textLoader}>En attente des joueurs... ({userCount}/10)</Text>
+        {lobbyCountdown !== null && (
+            <Text style={styles.countdownText}>
+                {lobbyCountdown > 0
+                    ? `Démarrage dans ${lobbyCountdown}s`
+                    : 'Démarrage...'}
+            </Text>
+        )}
         {joinedPlayers.map((name, index) => (
             <Text key={index} style={styles.joinedPlayerText}>✅ {name} a rejoint</Text>
         ))}
@@ -530,6 +563,12 @@ const styles = StyleSheet.create({
         fontSize: 24,
         textAlign: 'center',
         padding: 20,
+    },
+    countdownText: {
+        fontSize: 20,
+        color: '#ff6600',
+        fontWeight: 'bold',
+        marginTop: 10,
     },
     joinedPlayerText: {
         fontSize: 18,
