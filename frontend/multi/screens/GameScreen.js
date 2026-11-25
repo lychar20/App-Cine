@@ -84,13 +84,10 @@ export default function GameScreen ({ navigation }) {
 
 
         <TouchableOpacity
-            style={[styles.createNewButton, !userData && styles.disabledButton]}
-            disabled={!userData}
+            style={styles.createNewButton}
             onPress={() => saveRoomInDatabase(categoryName, userId, userName, categoryId)}
         >
-            <Text style={styles.touchableText}>
-                {userData ? 'Créer une partie' : 'Chargement...'}
-            </Text>
+            <Text style={styles.touchableText}>Créer une partie</Text>
         </TouchableOpacity>
 
         </View>

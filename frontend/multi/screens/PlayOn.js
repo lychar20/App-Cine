@@ -53,8 +53,9 @@ export default function PlayOn({ navigation }) {
     // Charger les questions dès l'arrivée sur l'écran
     useEffect(() => {
         setFetchError(null);
-        const categoryQuestions = questionsByCategory[categoryId] || questionsByCategory['cinema'];
-        setQuestions(categoryQuestions);
+        const allQuestions = questionsByCategory[categoryId] || questionsByCategory['cinema'];
+        const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+        setQuestions(shuffled.slice(0, 10));
     }, [categoryId]);
 
 
