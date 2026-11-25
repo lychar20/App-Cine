@@ -117,6 +117,7 @@ export default function SignUpScreen ({navigation, route}) {
           selected={date}
           onSelectedChange={handelChange}
           onDateChange={handelChange}
+          isGregorian={true}
           options={{
             weekDays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
             months: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
