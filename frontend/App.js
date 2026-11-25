@@ -17,6 +17,8 @@ import GameScreen from './multi/screens/GameScreen';
 import AssezCRelou from './multi/screens/AssezCRelou';
 import PlayOn from './multi/screens/PlayOn';
 import PartieScore from './multi/screens/PartieScore';
+import AdminLoginScreen from './admin/AdminLoginScreen';
+import AdminDashboard from './admin/AdminDashboard';
 
 const Stack = createStackNavigator();
 
@@ -37,6 +39,8 @@ export default function App() {
           <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{headerShown: false}} />
           <Stack.Screen name="Question" component={Question} options={{headerShown: false}} />
           <Stack.Screen name="Calendrier" component={Calendrier} />
+          <Stack.Screen name="AdminLogin" component={AdminLoginScreen} options={{headerShown: false}} />
+          <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={{headerShown: false}} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
