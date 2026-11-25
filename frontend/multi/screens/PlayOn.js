@@ -16,6 +16,7 @@ export default function PlayOn({ navigation }) {
     const { roomId, categoryId, host } = route.params;
     const [questions, setQuestions] = useState([]);
     const [userCount, setUserCount] = useState(0);
+    const [fetchError, setFetchError] = useState(null);
 
     const [isGameStarted, setIsGameStarted] = useState(false);
     const [lobbyCountdown, setLobbyCountdown] = useState(null);
@@ -155,12 +156,33 @@ export default function PlayOn({ navigation }) {
 
     //Fetch questions
 
-     const fetchData = async () => {
-        const amount = 10; // Par exemple, le nombre de questions que vous voulez
+     const fetchData = async (retryCount = 0) => {
+        const amount = 10;
         const url = `https://opentdb.com/api.php?amount=${amount}&category=${categoryId}`;
 
         try {
             const response = await axios.get(url);
+            const responseCode = response.data.response_code;
+            const results = response.data.results;
+
+            console.log("fetchData - response_code:", responseCode, "results:", results?.length);
+
+            if (responseCode === 5) {
+                if (retryCount < 5) {
+                    const delay = 5000 + Math.random() * 5000;
+                    setFetchError(`Trop de requêtes simultanées, nouvel essai dans ${Math.round(delay / 1000)}s... (tentative ${retryCount + 1}/5)`);
+                    setTimeout(() => fetchData(retryCount + 1), delay);
+                } else {
+                    setFetchError("Impossible de charger les questions après 5 tentatives. Contactez l'hôte.");
+                }
+                return;
+            }
+
+            if (!results || results.length === 0) {
+                setFetchError(`Aucune question reçue (code: ${responseCode}). Contactez l'hôte.`);
+                return;
+            }
+
             const decodeHTML = (str) => {
                 return str
                     .replace(/&amp;/g, '&')
@@ -186,7 +208,9 @@ export default function PlayOn({ navigation }) {
                     .replace(/&deg;/g, '°')
                     .replace(/&pi;/g, 'π');
             };
-            const formattedQuestions = response.data.results.map(q => ({
+
+            setFetchError(null);
+            const formattedQuestions = results.map(q => ({
                 question: decodeHTML(q.question),
                 options: [...q.incorrect_answers, q.correct_answer].map(decodeHTML).sort(() => Math.random() - 0.5),
                 correct_answer: decodeHTML(q.correct_answer)
@@ -194,8 +218,9 @@ export default function PlayOn({ navigation }) {
             setQuestions(formattedQuestions);
         } catch (error) {
             console.error("Erreur lors de la récupération des données:", error);
+            setFetchError(`Erreur réseau: ${error.message}`);
         }
-    }; 
+    };
 
     //questions from data
 
@@ -486,9 +511,20 @@ const Loader = () => (
     </View>
 );
 
+const ErrorScreen = () => (
+    <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>⚠️ {fetchError}</Text>
+    </View>
+);
+
 // Affichez le loader si la partie n'a pas encore commencé
 if (!isGameStarted) {
     return <Loader />;
+}
+
+// Erreur de chargement des questions
+if (fetchError && allQuestions.length === 0) {
+    return <ErrorScreen />;
 }
 
 
@@ -578,6 +614,20 @@ const styles = StyleSheet.create({
         color: '#ff6600',
         fontWeight: 'bold',
         marginTop: 10,
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 30,
+        backgroundColor: '#282c34',
+    },
+    errorText: {
+        color: '#ff4444',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        lineHeight: 28,
     },
     joinedPlayerText: {
         fontSize: 18,
