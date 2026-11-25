@@ -15,7 +15,8 @@ export const signup  = (req, res, next) => {
         const user = new User({
           email: req.body.email,
           name: req.body.name,
-          password: hash
+          password: hash,
+          entity: req.body.entity || 'default'
         });
         console.log("NAME", req.body.name);
         user.save()

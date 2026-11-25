@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 import userRoutes from './routes/user.js'; 
 import scoreRoutes from './routes/score.js'; 
 import roomRoutes from "./routes/roomRoutes.js";
+import adminRoutes from "./routes/admin.js";
 import path from 'path';
 import dotenv from 'dotenv';
 
@@ -48,7 +49,8 @@ app.use((req, res, next) => {
 
   app.use('/api/auth', scoreRoutes);
   app.use('/api/auth', userRoutes); 
-  app.use('/api/auth', roomRoutes); 
+  app.use('/api/auth', roomRoutes);
+  app.use('/api/admin', adminRoutes);
 
   app.get('/api/getTweet', (req, res, next) => {
     res.send("You mother fucker")

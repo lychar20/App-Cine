@@ -21,13 +21,14 @@ import { API_URL } from './config.js';
 
 
 
-export default function SignUpScreen ({navigation}) {
+export default function SignUpScreen ({navigation, route}) {
 
   // Function register
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState(''); 
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const entity = route?.params?.entity || 'default';
 
 
      console.log('EMAIL', email);
@@ -37,7 +38,8 @@ export default function SignUpScreen ({navigation}) {
      Axios.post(`${API_URL}/api/auth/signup/`, {
       email: email,
       password: password,
-      name: name
+      name: name,
+      entity: entity
     }).then((response) => {
       console.log(response)
       navigation.navigate('Home')
