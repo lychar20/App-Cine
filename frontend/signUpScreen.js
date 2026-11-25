@@ -116,9 +116,10 @@ export default function SignUpScreen ({navigation, route}) {
           mode='calendar'
           selected={date}
           onDateChange={handelChange}
-          /* minimumDate={new Date('1999-01-01')}
-        maximumDate={new Date('2012-01-01')} */
-          
+          options={{
+            weekDays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            months: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+          }}
           />
  
  
