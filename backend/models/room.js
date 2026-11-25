@@ -31,7 +31,7 @@ import mongoose, { Schema } from "mongoose"
 const RoomSchema = new Schema(
   {
     category: { type: String, required: true },
-    categoryId: { type: Number },
+    categoryId: { type: String },
     userName: { type: String, required: true },
     host: {
       type: Schema.Types.ObjectId,
