@@ -187,7 +187,7 @@ export default function Home({ navigation }) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#ADD8E6',
+      backgroundColor: '#ffffff',
       //alignItems: 'center',
       justifyContent: 'center',
       paddingRight: 15,
