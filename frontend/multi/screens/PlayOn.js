@@ -7,6 +7,7 @@ import { io } from "socket.io-client";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import data from '../../data';
+import questionsByCategory from '../../data/questions/index';
 import { API_URL } from '../../config.js';
 
 const socket = io(API_URL);
@@ -51,9 +52,9 @@ export default function PlayOn({ navigation }) {
 
     // Charger les questions dès l'arrivée sur l'écran
     useEffect(() => {
-        if (categoryId) {
-            fetchData();
-        }
+        setFetchError(null);
+        const categoryQuestions = questionsByCategory[categoryId] || questionsByCategory['cinema'];
+        setQuestions(categoryQuestions);
     }, [categoryId]);
 
 
