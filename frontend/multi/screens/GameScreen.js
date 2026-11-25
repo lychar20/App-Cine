@@ -83,18 +83,15 @@ export default function GameScreen ({ navigation }) {
           <Text style={styles.title}>{categoryName}</Text>
 
 
-        <TouchableOpacity style={styles.createNewButton} 
-             onPress={() => {
-                if (userId && userName) { // Vérifiez que userId et userName sont disponibles
-                    saveRoomInDatabase(categoryName, userId, userName, categoryId);
-                } else {
-                    console.error("User ID ou nom d'utilisateur manquant !");
-                }
-            }}  >
-
-                    <Text style={styles.touchableText} >Créer une partie</Text>
-
-            </TouchableOpacity>
+        <TouchableOpacity
+            style={[styles.createNewButton, !userData && styles.disabledButton]}
+            disabled={!userData}
+            onPress={() => saveRoomInDatabase(categoryName, userId, userName, categoryId)}
+        >
+            <Text style={styles.touchableText}>
+                {userData ? 'Créer une partie' : 'Chargement...'}
+            </Text>
+        </TouchableOpacity>
 
         </View>
       );
@@ -108,7 +105,22 @@ const styles = StyleSheet.create({
       backgroundColor: '#f9f9f9', 
     },
     title: {
-      fontSize: 24, 
-      fontWeight: 'bold', 
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
+    createNewButton: {
+      marginTop: 30,
+      backgroundColor: '#007bff',
+      padding: 15,
+      borderRadius: 10,
+    },
+    disabledButton: {
+      opacity: 0.5,
+    },
+    touchableText: {
+      color: '#fff',
+      fontSize: 18,
+      fontWeight: 'bold',
+      textAlign: 'center',
     },
   });
