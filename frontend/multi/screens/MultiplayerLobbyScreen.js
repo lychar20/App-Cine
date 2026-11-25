@@ -36,12 +36,12 @@ export default function MultiplayerLobbyScreen({ navigation }) {
     <View style={styles.container}>
         <View style={styles.joinGameRow}>
               <View style={styles.flexOne}>
-                <Text style={styles.activeRoomsTitle}>Join a game</Text>
+                <Text style={styles.activeRoomsTitle}>Rejoindre une partie</Text>
               </View>
               <View style={styles.flexOne}>
                 <TouchableOpacity style={styles.createNewButton} 
                 /* onPress=  {() => navigation.navigate('AssezCRelou') }  */ onPress=  {() => navigation.navigate('CreateGameScreen') }    >
-                          <Text style={styles.touchableText} >Create New</Text>
+                          <Text style={styles.touchableText} >Créer une partie</Text>
                   </TouchableOpacity>
               </View>
         </View>
@@ -59,17 +59,17 @@ export default function MultiplayerLobbyScreen({ navigation }) {
                           navigation.navigate('PlayOn', { roomId: room._id, categoryId: selectedCategoryId, host: room.host });
                       }} // Naviguer vers l'écran de jeu
                     >
-                        <Text style={styles.roomText}>{room.category} - Hosted by {room.userName}</Text>
+                        <Text style={styles.roomText}>{room.category} - Créée par {room.userName}</Text>
                     </TouchableOpacity>
                 ))
             ) : (
-                <Text style={styles.noRoomsText}>No active rooms available.</Text>
+                <Text style={styles.noRoomsText}>Aucune partie disponible.</Text>
             )}
 
     
 
         <TouchableOpacity style={styles.backeButton} onPress=  {() => navigation.navigate('Welcome') }    >
-                      <Text style={styles.touchableText} >Back to Main Menu</Text>
+                      <Text style={styles.touchableText} >Menu principal</Text>
               </TouchableOpacity>
 
   </View>

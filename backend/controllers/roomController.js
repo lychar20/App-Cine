@@ -69,3 +69,13 @@ export const deleteRoom = async userId => {
     console.error("Error deleting room:", error)
   }
 }
+
+export const deleteAllRooms = async (_req, res) => {
+  try {
+    await RoomService.deleteAllRooms()
+    res.json({ status: "ok", message: "Toutes les rooms supprimées" })
+  } catch (error) {
+    console.error(error)
+    res.status(500).send({ status: "error", message: error.message })
+  }
+}

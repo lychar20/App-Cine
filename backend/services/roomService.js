@@ -61,3 +61,7 @@ export const getActiveRooms = async () => {
 export const deleteRoomByUserId = async userId => {
   await Room.deleteOne({ host: userId })
 }
+
+export const deleteAllRooms = async () => {
+  await Room.deleteMany({})
+}

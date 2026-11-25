@@ -15,9 +15,9 @@ export default function useRoomListener() {
 
         setActiveRooms(rooms)
       } catch (err) {
-        Alert.alert("Error", "Couldn't find rooms, please try again.", [
-          { text: "Retry", onPress: () => fetchActiveRooms() },
-          { text: "Cancel", style: "cancel" }
+        Alert.alert("Erreur", "Impossible de trouver des salles, veuillez réessayer.", [
+          { text: "Réessayer", onPress: () => fetchActiveRooms() },
+          { text: "Annuler", style: "cancel" }
         ])
       } finally {
         setLoading(false)
