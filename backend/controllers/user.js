@@ -6,6 +6,7 @@ const User = require('../models/user'); */
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
+import Admin from '../models/admin.js';
 
 const JWT_SECRET = 'RANDOM_TOKEN_SECRET'
 
@@ -30,30 +31,29 @@ export const signup  = (req, res, next) => {
   //////
 
 
-  export const login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
-        .then(user => {
-            if (!user) {
-                return res.status(401).json({ message: 'Paire login/mot de passe incorrecte '});
-            }
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => {
-                    if (!valid) {
-                        return res.status(401).json({ message: 'Paire login/mot de passe incorrecte ' });
-                    }
-                    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
-                    res.status(200).json({
-                      status: "ok",
-                      data: token,
-                      userType: user.userType
-                    });
+  export const login = async (req, res, next) => {
+    try {
+      // Cherche d'abord dans les admins
+      const admin = await Admin.findOne({ email: req.body.email });
+      if (admin) {
+        const valid = await bcrypt.compare(req.body.password, admin.password);
+        if (!valid) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
+        const token = jwt.sign({ adminId: admin._id, entity: admin.entity }, 'ADMIN_TOKEN_SECRET');
+        return res.status(200).json({ status: 'ok', data: token, userType: 'admin', entity: admin.entity });
+      }
 
+      // Sinon cherche dans les users
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
+      const valid = await bcrypt.compare(req.body.password, user.password);
+      if (!valid) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
+      const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
+      return res.status(200).json({ status: 'ok', data: token, userType: 'user' });
 
-                })
-                .catch(error => res.status(500).json({ error }));
-        })
-        .catch(error => res.status(500).json({ error }));
- }; 
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+ };
 
 
 

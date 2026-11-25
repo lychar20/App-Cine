@@ -81,12 +81,16 @@ export default function Home({ navigation }) {
       Axios.post(`${API_URL}/api/auth/login/`, {
         email: email,
         password: password,
-      }).then((response) => {
-        console.log("ICI", response.data.data)
-        AsyncStorage.setItem('token', JSON.stringify(response.data.data));
-        navigation.navigate('Welcome')
-        
-  
+      }).then(async (response) => {
+        console.log("ICI", response.data)
+        if (response.data.userType === 'admin') {
+          await AsyncStorage.setItem('adminToken', response.data.data);
+          await AsyncStorage.setItem('adminEntity', response.data.entity);
+          navigation.navigate('AdminDashboard');
+        } else {
+          AsyncStorage.setItem('token', JSON.stringify(response.data.data));
+          navigation.navigate('Welcome');
+        }
       }).catch(function(error) {
         console.log("ERROR", error.response.data);
       });
