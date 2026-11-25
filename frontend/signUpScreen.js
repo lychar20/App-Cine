@@ -115,7 +115,7 @@ export default function SignUpScreen ({navigation, route}) {
          <DatePicker style={styles.temps}
           mode='calendar'
           selected={date}
-          onDateChange={handelChange}
+          onSelectedChange={handelChange}
           options={{
             weekDays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
             months: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
