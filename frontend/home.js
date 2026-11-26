@@ -92,7 +92,9 @@ export default function Home({ navigation }) {
           navigation.navigate('Welcome');
         }
       }).catch(function(error) {
-        console.log("ERROR", error.response.data);
+        console.log("ERROR", error.response?.data);
+        const msg = error.response?.data?.message || 'Identifiants incorrects.';
+        Alert.alert('Connexion impossible', msg);
       });
 
     }

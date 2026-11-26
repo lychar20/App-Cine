@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from 'expo-status-bar';
-import { Button, Modal, StyleSheet, Text, TextInput, View, Image, SafeAreaView, ScrollView } from 'react-native';
+import { Alert, Button, Modal, StyleSheet, Text, TextInput, View, Image, SafeAreaView, ScrollView } from 'react-native';
 import { Entypo, MaterialCommunityIcons, Ionicons, AntDesign } from '@expo/vector-icons'
 import { TouchableOpacity } from "react-native-gesture-handler";
 //import DatePicker from "react-native-date-picker";
@@ -42,12 +42,11 @@ export default function SignUpScreen ({navigation, route}) {
       entity: entity
     }).then((response) => {
       console.log(response)
-      navigation.navigate('Home')
-      
+      navigation.navigate('EmailVerification', { email });
     }).catch(function(error) {
-      console.log(error.response.message);
+      console.log(error.response?.data);
+      Alert.alert('Erreur', error.response?.data?.error?.message || 'Une erreur est survenue.');
     });
-  
   }
 
   //

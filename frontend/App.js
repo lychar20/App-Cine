@@ -19,6 +19,7 @@ import PlayOn from './multi/screens/PlayOn';
 import PartieScore from './multi/screens/PartieScore';
 import AdminLoginScreen from './admin/AdminLoginScreen';
 import AdminDashboard from './admin/AdminDashboard';
+import EmailVerificationScreen from './EmailVerificationScreen';
 
 const Stack = createStackNavigator();
 
@@ -41,6 +42,7 @@ export default function App() {
           <Stack.Screen name="Calendrier" component={Calendrier} />
           <Stack.Screen name="AdminLogin" component={AdminLoginScreen} options={{headerShown: false}} />
           <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={{headerShown: false}} />
+          <Stack.Screen name="EmailVerification" component={EmailVerificationScreen} options={{headerShown: false}} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

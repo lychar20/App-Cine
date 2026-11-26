@@ -5,27 +5,35 @@ const User = require('../models/user'); */
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/user.js';
 import Admin from '../models/admin.js';
+import { sendVerificationEmail } from '../services/emailService.js';
 
 const JWT_SECRET = 'RANDOM_TOKEN_SECRET'
 
-export const signup  = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10)
-      .then(hash => {
-        const user = new User({
-          email: req.body.email,
-          name: req.body.name,
-          password: hash,
-          entity: req.body.entity || 'default'
-        });
-        console.log("NAME", req.body.name);
-        user.save()
-          .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-          .catch(error => res.status(400).json({ error }));
-      })
-      .catch(error => res.status(500).json({ error }));
-  };
+export const signup = async (req, res, next) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    const user = new User({
+      email: req.body.email,
+      name: req.body.name,
+      password: hash,
+      entity: req.body.entity || 'default',
+      isVerified: false,
+      verificationToken,
+    });
+
+    await user.save();
+    await sendVerificationEmail(req.body.email, verificationToken);
+
+    res.status(201).json({ message: 'Compte créé ! Vérifiez votre email pour activer votre compte.' });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+};
 
 
   //////
@@ -47,6 +55,7 @@ export const signup  = (req, res, next) => {
       if (!user) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
       const valid = await bcrypt.compare(req.body.password, user.password);
       if (!valid) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
+      if (!user.isVerified) return res.status(403).json({ message: 'Veuillez vérifier votre email avant de vous connecter.' });
       const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
       return res.status(200).json({ status: 'ok', data: token, userType: 'user' });
 
@@ -95,6 +104,19 @@ export const signup  = (req, res, next) => {
 
 
 
+
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ verificationToken: req.params.token });
+    if (!user) return res.status(400).send('<h2>Lien invalide ou expiré.</h2>');
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+    res.send('<h2 style="font-family:Arial;color:green;text-align:center;margin-top:50px">✅ Email vérifié ! Vous pouvez maintenant vous connecter sur l\'application.</h2>');
+  } catch (error) {
+    res.status(500).send('<h2>Erreur serveur.</h2>');
+  }
+};
 
 export const getData = async (req, res, next) => {
     let { token } = req.body;
