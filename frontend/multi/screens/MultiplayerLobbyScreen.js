@@ -3,14 +3,28 @@ import React,  { useEffect, useState } from 'react'
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {colorList} from '../constants/colors';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../../config.js';
 
 
 
 export default function MultiplayerLobbyScreen({ navigation }) {
 
-  const [activeRooms, setActiveRooms] = useState([]); 
+  const [activeRooms, setActiveRooms] = useState([]);
   const [categoryId, setCategoryId] = useState(null);
+  const [userEntity, setUserEntity] = useState('default');
+
+  useEffect(() => {
+    const fetchUserEntity = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.post(`${API_URL}/api/auth/userdata/`, { token });
+        setUserEntity(res.data.data?.entity || 'default');
+      } catch {}
+    };
+    fetchUserEntity();
+  }, []);
 
   /* requete axios */
 
@@ -56,7 +70,7 @@ export default function MultiplayerLobbyScreen({ navigation }) {
                         onPress={() => {
                           // Récupérer categoryId de la salle sur laquelle l'utilisateur clique
                           const selectedCategoryId = room.categoryId; // Assurez-vous que cela correspond à votre structure de données
-                          navigation.navigate('PlayOn', { roomId: room._id, categoryId: selectedCategoryId, host: room.host });
+                          navigation.navigate('PlayOn', { roomId: room._id, categoryId: selectedCategoryId, host: room.host, entity: userEntity });
                       }} // Naviguer vers l'écran de jeu
                     >
                         <Text style={styles.roomText}>{room.category} - Créée par {room.userName}</Text>

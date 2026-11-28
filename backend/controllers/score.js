@@ -10,7 +10,7 @@ const JWT_SECRET = 'RANDOM_TOKEN_SECRET'
 
 
 export const saveScore = async (req, res, next) => {
-    let { token, score, roomId } = req.body;
+    let { token, score, roomId, entity } = req.body;
     token = token.replace(/"/g, "");
 
     if (!token || score === undefined) {
@@ -21,7 +21,7 @@ export const saveScore = async (req, res, next) => {
         const decoded = jwt.verify(token, JWT_SECRET);
         const userId = decoded.userId;
 
-        const newScore = new Score({ userId, score, roomId: roomId || null });
+        const newScore = new Score({ userId, score, roomId: roomId || null, entity: entity || 'default' });
         await newScore.save();
 
         return res.status(201).json({ message: "Score sauvegardé avec succès" });

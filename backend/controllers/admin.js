@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Admin from '../models/admin.js';
 import User from '../models/user.js';
+import Score from '../models/score.js';
 
 const JWT_SECRET = 'RANDOM_TOKEN_SECRET';
 const ADMIN_JWT_SECRET = 'ADMIN_TOKEN_SECRET';
@@ -52,6 +53,54 @@ export const getEntityUsers = async (req, res) => {
       'name email entity createdAt'
     );
     res.status(200).json({ status: 'ok', users });
+  } catch (error) {
+    res.status(401).json({ message: 'Token invalide' });
+  }
+};
+
+export const getEntityScores = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Token manquant' });
+
+    const decoded = jwt.verify(token, ADMIN_JWT_SECRET);
+    const scores = await Score.find({ entity: decoded.entity })
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
+
+    const result = scores.map(s => ({
+      _id: s._id,
+      score: s.score,
+      roomId: s.roomId,
+      date: s.createdAt,
+      userName: s.userId?.name || 'Inconnu',
+      userEmail: s.userId?.email || '',
+    }));
+    res.status(200).json({ status: 'ok', scores: result });
+  } catch (error) {
+    res.status(401).json({ message: 'Token invalide' });
+  }
+};
+
+export const exportEntityScores = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Token manquant' });
+
+    const decoded = jwt.verify(token, ADMIN_JWT_SECRET);
+    const scores = await Score.find({ entity: decoded.entity })
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
+
+    const header = 'Nom,Email,Score,Partie,Date\n';
+    const rows = scores
+      .map(s => `${s.userId?.name || ''},${s.userId?.email || ''},${s.score},${s.roomId || ''},${s.createdAt?.toISOString() ?? ''}`)
+      .join('\n');
+    const csv = header + rows;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="scores_${decoded.entity}.csv"`);
+    res.status(200).send(csv);
   } catch (error) {
     res.status(401).json({ message: 'Token invalide' });
   }

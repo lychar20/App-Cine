@@ -6,6 +6,7 @@ const scoreSchema = mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   score: { type: Number, required: true },
   roomId: { type: String, default: null },
+  entity: { type: String, default: 'default' },
 }, { timestamps: true });
 
 

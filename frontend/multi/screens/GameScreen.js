@@ -64,7 +64,7 @@ export default function GameScreen ({ navigation }) {
           })
       
           if (response.data && response.data.roomId) {
-            navigation.navigate('PlayOn', { roomId: response.data.roomId, categoryId}); // Naviguer vers PlayOn avec roomId
+            navigation.navigate('PlayOn', { roomId: response.data.roomId, categoryId, entity: userData?.entity || 'default' });
           } else {
             //la création de la salle a échoué
             console.error("Room creation failed: ", response.data);

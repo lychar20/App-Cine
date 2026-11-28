@@ -14,7 +14,7 @@ const socket = io(API_URL);
 
 export default function PlayOn({ navigation }) {
     const route = useRoute();
-    const { roomId, categoryId, host } = route.params;
+    const { roomId, categoryId, host, entity } = route.params;
     const [questions, setQuestions] = useState([]);
     const [userCount, setUserCount] = useState(0);
     const [fetchError, setFetchError] = useState(null);
@@ -483,7 +483,7 @@ return null;
         }
 
         try {
-            const response = await axios.post(`${API_URL}/api/auth/save-score`, { token, score, roomId });
+            const response = await axios.post(`${API_URL}/api/auth/save-score`, { token, score, roomId, entity: entity || 'default' });
 
 
         } catch (error) {
