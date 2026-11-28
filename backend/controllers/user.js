@@ -22,14 +22,12 @@ export const signup = async (req, res, next) => {
       name: req.body.name,
       password: hash,
       entity: req.body.entity || 'default',
-      isVerified: false,
-      verificationToken,
+      isVerified: true,
     });
 
     await user.save();
-    await sendVerificationEmail(req.body.email, verificationToken);
 
-    res.status(201).json({ message: 'Compte créé ! Vérifiez votre email pour activer votre compte.' });
+    res.status(201).json({ message: 'Compte créé avec succès !' });
   } catch (error) {
     res.status(400).json({ error });
   }
@@ -55,7 +53,6 @@ export const signup = async (req, res, next) => {
       if (!user) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
       const valid = await bcrypt.compare(req.body.password, user.password);
       if (!valid) return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
-      if (!user.isVerified) return res.status(403).json({ message: 'Veuillez vérifier votre email avant de vous connecter.' });
       const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET);
       return res.status(200).json({ status: 'ok', data: token, userType: 'user' });
 

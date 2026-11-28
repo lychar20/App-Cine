@@ -42,7 +42,7 @@ export default function SignUpScreen ({navigation, route}) {
       entity: entity
     }).then((response) => {
       console.log(response)
-      navigation.navigate('EmailVerification', { email });
+      navigation.navigate('Home');
     }).catch(function(error) {
       console.log(error.response?.data);
       Alert.alert('Erreur', error.response?.data?.error?.message || 'Une erreur est survenue.');
